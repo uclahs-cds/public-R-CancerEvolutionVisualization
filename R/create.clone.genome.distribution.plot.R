@@ -104,8 +104,9 @@ create.clone.genome.distribution.plot.per.sample <- function(
             warning(paste('Skipping clone', k, 'in sample', unique(sample.df$ID), 'since there is only one SNV'));
             next;
         }
-        density.list[[k]] <- calculate.density.and.scale(
-            cluster.df = sample.df[sample.df$clone.id == k, ]
+        density.list[[k]] <- calculate.density(
+            x = sample.df[sample.df$clone.id == k, ],
+            adjust = 0.05
             );
         }
     density.df <- do.call(rbind, density.list);
@@ -168,6 +169,15 @@ create.clone.genome.distribution.plot.per.sample <- function(
     height.scatter <- 0.5 * length(unique(sample.df$clone.id));
     total.height <- height.scatter + 5;
 
+    if (legend.x > 1) {
+        cluster.legend <- list(right = list(fun = cluster.legend));
+    } else {
+        cluster.legend <- list(inside = list(
+            fun = cluster.legend,
+            x = legend.x,
+            y = legend.y
+            ));
+        }
     return(BoutrosLab.plotting.general::create.multipanelplot(
         filename = save.plt,
         plot.objects = list(
@@ -177,11 +187,7 @@ create.clone.genome.distribution.plot.per.sample <- function(
         layout.width = 1,
         layout.height = 2,
         plot.objects.heights = c(height.scatter, 5) / total.height,
-        legend = list(inside = list(
-                fun = cluster.legend,
-                x = legend.x,
-                y = legend.y
-                )),
+        legend = cluster.legend,
         height = total.height,
         width = width,
         ...
