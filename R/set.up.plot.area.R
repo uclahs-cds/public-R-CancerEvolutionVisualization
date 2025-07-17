@@ -247,6 +247,11 @@ add.yaxis <- function(
 
 	y.ticks.at <- ylabels / conversion.factor;
 
+	if (length(ylabels) == 0 || length(y.ticks.at) == 0) {
+        warning('No y-axis ticks to draw. Skipping axis rendering.');
+        return(ymax);
+        }
+
 	yaxis1 <- yaxisGrob(
 	    name = 'axis.content',
 	    at = y.ticks.at,
