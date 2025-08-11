@@ -29,7 +29,7 @@ get.colours <- function(
 #' specified and are used as the first colors for the `value.list`.
 #'
 #' @param value.list A vector of values.
-#' @param value.order An optional vector specifying the order of values. If `NULL`, value order is not gauranteed.
+#' @param value.order An optional vector specifying the order of values. If `NULL`, value order is not guaranteed.
 #' @param predetermined.colours A vector of colors assigned to values. If `NULL`, colors will be generated automatically.
 #'
 #' @return A list containing:
@@ -38,23 +38,26 @@ get.colours <- function(
 #'   \item{value.order}{The ordered values.}
 #' }
 get.colours.in.order <- function(
-    value.list,
+    value.list = NULL,
     value.order = NULL,
     predetermined.colours = NULL
     ) {
 
-    if (is.null(predetermined.colours) && is.null(value.order)) {
-        value.list <- NULL;
+    if (is.null(value.list) && is.null(value.order)) {
+        return(list(
+            colours = NULL,
+            value.order = NULL
+            ));
         }
 
     if (is.null(value.order) && !is.null(value.list)) {
         value.order <- unique(value.list);
         }
 
-    if (is.null(predetermined.colours) || is.null(value.order)) {
-        predetermined.colours <- NULL;
+    if (is.null(predetermined.colours) && !is.null(value.order)) {
+        predetermined.colours <- get.colours(value.order)  # named vector
     } else {
-        sampled.colours <- get.colours(value.list);
+        sampled.colours <- get.colours(value.order);
         sampled.colours[seq_along(predetermined.colours)] <- predetermined.colours;
         predetermined.colours <- setNames(
             sampled.colours[seq_along(value.order)],
