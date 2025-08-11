@@ -5,61 +5,61 @@ expect.character.vector <- function(result) {
     }
 
 test_that('get.colours returns a color for each vector element', {
-  value.list <- c('ABC', 'DEF', 'DEF', 'GHI');
-  colors <- get.colours(value.list);
-  expect_equal(names(colors), c('ABC', 'DEF', 'DEF', 'GHI'));
-  expect_equal(length(colors), 4);
-  for (i in seq_along(colors)) {
-    color.value <- colors[i];
-    expect_true(!is.na(color.value) && nzchar(color.value));
-    }
-  });
+    value.list <- c('ABC', 'DEF', 'DEF', 'GHI');
+    colors <- get.colours(value.list);
+    expect_equal(names(colors), c('ABC', 'DEF', 'DEF', 'GHI'));
+    expect_equal(length(colors), 4);
+    for (i in seq_along(colors)) {
+        color.value <- colors[i];
+        expect_true(!is.na(color.value) && nzchar(color.value));
+        }
+    });
 
 test_that('get.colours returns a color for each vector element when return.names is FALSE', {
-  value.list <- c('ABC', 'DEF', 'DEF', 'GHI');
-  colors <- get.colours(value.list, FALSE);
-  expect_equal(names(colors), c('ABC', 'DEF', 'DEF', 'GHI'));
-  expect_equal(length(colors), 4);
-  for (i in seq_along(colors)) {
-    color.value <- colors[i];
-    expect_true(!is.na(color.value) && nzchar(color.value));
-    }
-  });
+    value.list <- c('ABC', 'DEF', 'DEF', 'GHI');
+    colors <- get.colours(value.list, FALSE);
+    expect_equal(names(colors), c('ABC', 'DEF', 'DEF', 'GHI'));
+    expect_equal(length(colors), 4);
+    for (i in seq_along(colors)) {
+        color.value <- colors[i];
+        expect_true(!is.na(color.value) && nzchar(color.value));
+        }
+    });
 
 test_that('get.colours returns a color for unique vector elements when return.names is TRUE', {
-  value.list <- c('ABC', 'DEF', 'DEF', 'GHI');
-  colors <- get.colours(value.list, TRUE);
-  expect_equal(names(colors), c('ABC', 'DEF', 'GHI'));
-  expect_equal(length(colors), 3);
-  unique.colors <- unique(names(colors));
-  for (key in unique.colors) {
-    expect_true(!is.na(colors[key]) && nzchar(colors[key]));
-    }
-  });
+    value.list <- c('ABC', 'DEF', 'DEF', 'GHI');
+    colors <- get.colours(value.list, TRUE);
+    expect_equal(names(colors), c('ABC', 'DEF', 'GHI'));
+    expect_equal(length(colors), 3);
+    unique.colors <- unique(names(colors));
+    for (key in unique.colors) {
+        expect_true(!is.na(colors[key]) && nzchar(colors[key]));
+        }
+    });
 
 test_that('get.colours returns an empty color vector when value.list is empty', {
-  value.list <- c();
-  colors <- get.colours(value.list);
-  expect_true(identical(names(colors), character(0)));
-  expect_true(identical(colors, setNames(character(0), character(0))));
-  expect_equal(length(colors), 0);
-  });
+    value.list <- c();
+    colors <- get.colours(value.list);
+    expect_true(identical(names(colors), character(0)));
+    expect_true(identical(colors, setNames(character(0), character(0))));
+    expect_equal(length(colors), 0);
+    });
 
 test_that('get.colours returns an empty color vector when value.list is empty and return.names is FALSE', {
-  value.list <- c();
-  colors <- get.colours(value.list, FALSE);
-  expect_true(identical(names(colors), character(0)));
-  expect_true(identical(colors, setNames(character(0), character(0))));
-  expect_equal(length(colors), 0);
-  });
+    value.list <- c();
+    colors <- get.colours(value.list, FALSE);
+    expect_true(identical(names(colors), character(0)));
+    expect_true(identical(colors, setNames(character(0), character(0))));
+    expect_equal(length(colors), 0);
+    });
 
 test_that('get.colours returns an empty color vector when value.list is empty and return.names is TRUE', {
-  value.list <- c();
-  colors <- get.colours(value.list, TRUE);
-  expect_true(identical(names(colors), character(0)));
-  expect_true(identical(colors, setNames(character(0), character(0))));
-  expect_equal(length(colors), 0);
-  });
+    value.list <- c();
+    colors <- get.colours(value.list, TRUE);
+    expect_true(identical(names(colors), character(0)));
+    expect_true(identical(colors, setNames(character(0), character(0))));
+    expect_equal(length(colors), 0);
+    });
 
 test_that(
     'get.colours returns expected vectors', {
@@ -79,99 +79,142 @@ test_that(
     'get.colours.in.order returns expected vectors when order is not specified', {
         # get.colours.in.order has same result as get.colours
         # with the change that a named list is returned with two members
-        result <- get.colours.in.order(NULL, predetermined.colours = NULL)
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(c('ABC', 'DEF'), predetermined.colours = NULL)
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(NULL, predetermined.colours = c('red','green'))
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(c(), predetermined.colours = c())
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(c(), predetermined.colours = NULL)
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(NULL, predetermined.colours = c())
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(c('ABC', 'DEF'), predetermined.colours = c())
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(c(), predetermined.colours = c('red', 'green'))
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(c('ABC','DEF'), predetermined.colours = c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(ABC = 'red',DEF = 'green'), value.order = c('ABC','DEF'))))
-        result <- get.colours.in.order(c('ABC','DEF'), predetermined.colours = c('red'))
-        expect_equal(names(result), c('colours', 'value.order'))
-        expect_equal(names(result$colours), c('ABC', 'DEF'))
-        expect_true(result$colours['ABC'] == 'red')
-        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']))
-        expect_equal(result$value.order, c('ABC','DEF'))
+        result <- get.colours.in.order(NULL, NULL, NULL);
+        expect_true(setequal(result, list(colours = NULL, value.order = NULL)));
 
-        result <- get.colours.in.order(c('ABC','DEF'), predetermined.colours = c(NULL,'red'))
-        expect_equal(names(result), c('colours', 'value.order'))
-        expect_equal(names(result$colours), c('ABC','DEF'))
-        expect_true(result$colours['ABC'] == 'red')
-        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']))
-        expect_equal(result$value.order, c('ABC','DEF'))
+        result <- get.colours.in.order(value.list = c(), predetermined.colours = c());
+        expect_true(setequal(result, list(colours = NULL, value.order = NULL)));
 
-        result <- get.colours.in.order(c('ABC','DEF'), predetermined.colours = c('red',NULL))
-        expect_equal(names(result), c('colours', 'value.order'))
-        expect_equal(names(result$colours), c('ABC','DEF'))
-        expect_true(result$colours['ABC'] == 'red')
-        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']))
-        expect_equal(result$value.order, c('ABC','DEF'))
+        result <- get.colours.in.order(value.list = c(), predetermined.colours = NULL);
+        expect_true(setequal(result, list(colours = NULL, value.order = NULL)));
 
-        result <- get.colours.in.order(c('ABC'), predetermined.colours = c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(ABC = 'red'), value.order = c('ABC'))))
-        result <- get.colours.in.order(c(NULL,'ABC'), predetermined.colours = c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(ABC = 'red'), value.order = c('ABC'))))
-        result <- get.colours.in.order(c('ABC',NULL), predetermined.colours = c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(ABC = 'red'), value.order = c('ABC'))))
+        result <- get.colours.in.order(value.list = NULL, predetermined.colours = c());
+        expect_true(setequal(result, list(colours = NULL, value.order = NULL)));
+
+        result <- get.colours.in.order(c('ABC', 'DEF'), predetermined.colours = c());
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('ABC', 'DEF'));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_equal(result$value.order, c('ABC','DEF'));
+
+        result <- get.colours.in.order(value.list = c('ABC', 'ABC'), predetermined.colours = NULL);
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('ABC'));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+
+        result <- get.colours.in.order(predetermined.colours = c('red','green'));
+        expect_true(setequal(result, list(colours = NULL, value.order = NULL)));
+
+        result <- get.colours.in.order(value.list = c(), predetermined.colours = c('red', 'green'));
+        expect_true(setequal(result, list(colours = NULL, value.order = NULL)));
+
+        result <- get.colours.in.order(value.list = c('ABC','DEF'), predetermined.colours = c('red','green'));
+        expect_true(setequal(result, list(colours = c(ABC = 'red',DEF = 'green'), value.order = c('ABC','DEF'))));
+
+        result <- get.colours.in.order(value.list = c('ABC','DEF'), predetermined.colours = c('red'));
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('ABC', 'DEF'));
+        expect_true(result$colours['ABC'] == 'red');
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_equal(result$value.order, c('ABC','DEF'));
+
+        result <- get.colours.in.order(value.list = c('ABC','DEF'), predetermined.colours = c(NULL,'red'));
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('ABC','DEF'));
+        expect_true(result$colours['ABC'] == 'red');
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_equal(result$value.order, c('ABC','DEF'));
+
+        result <- get.colours.in.order(value.list = c('ABC','DEF'), predetermined.colours = c('red',NULL));
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('ABC','DEF'));
+        expect_true(result$colours['ABC'] == 'red');
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_equal(result$value.order, c('ABC','DEF'));
+
+        result <- get.colours.in.order(value.list = c('ABC'), predetermined.colours = c('red','green'));
+        expect_true(setequal(result, list(colours = c(ABC = 'red'), value.order = c('ABC'))));
+
+        result <- get.colours.in.order(value.list = c(NULL,'ABC'), predetermined.colours = c('red','green'));
+        expect_true(setequal(result, list(colours = c(ABC = 'red'), value.order = c('ABC'))));
+
+        result <- get.colours.in.order(value.list = c('ABC',NULL), predetermined.colours = c('red','green'));
+        expect_true(setequal(result, list(colours = c(ABC = 'red'), value.order = c('ABC'))));
     });
 
 test_that(
     'get.colours.in.order returns expected vectors when order is specified', {
         # get.colours.in.order with order specified
-        result <- get.colours.in.order(NULL, c('DEF','ABC'), NULL)
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(c('ABC', 'DEF'), c('DEF','ABC'), NULL)
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(NULL, predetermined.colours = c('red','green'))
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = NULL)))
-        result <- get.colours.in.order(c(), c('DEF', 'ABC'), c())
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(c(), c('DEF','ABC'), NULL)
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(NULL, c('DEF', 'ABC'), c())
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = c('DEF','ABC'))))
+        result <- get.colours.in.order(NULL, c('DEF','ABC'), NULL);
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
+
+        result <- get.colours.in.order(c('ABC', 'DEF'), c('DEF','ABC'), NULL);
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
+
         result <- get.colours.in.order(c('ABC', 'DEF'), c('DEF', 'ABC'), c())
-        expect_true(setequal(result, list(predetermined.colours = NULL, value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(c(), c('DEF','ABC'), c('red', 'green'))
-        expect_true(setequal(result, list(predetermined.colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c('red'))
-        expect_equal(names(result), c('colours', 'value.order'))
-        expect_equal(names(result$colours), c('DEF', 'ABC'))
-        expect_true(result$colours['DEF'] == 'red')
-        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']))
-        expect_equal(result$value.order, c('DEF','ABC'))
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
 
-        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c(NULL,'red'))
-        expect_equal(names(result), c('colours', 'value.order'))
-        expect_equal(names(result$colours), c('DEF','ABC'))
-        expect_true(result$colours['DEF'] == 'red')
-        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']))
-        expect_equal(result$value.order, c('DEF','ABC'))
+        result <- get.colours.in.order(c(), c('DEF', 'ABC'), c());
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
 
-        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c('red',NULL))
-        expect_equal(names(result), c('colours', 'value.order'))
-        expect_equal(names(result$colours), c('DEF','ABC'))
-        expect_true(result$colours['DEF'] == 'red')
-        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']))
-        expect_equal(result$value.order, c('DEF','ABC'))
+        result <- get.colours.in.order(c(), c('DEF','ABC'), NULL);
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
 
-        result <- get.colours.in.order(c('ABC'), c('DEF','ABC'), c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(c(NULL,'ABC'), c('DEF','ABC'), c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC'))))
-        result <- get.colours.in.order(c('ABC',NULL), c('DEF','ABC'), c('red','green'))
-        expect_true(setequal(result,list(predetermined.colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC'))))
+        result <- get.colours.in.order(NULL, c('DEF', 'ABC'), c());
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(!is.na(result$colours['DEF']) && nzchar(result$colours['DEF']));
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
+
+        result <- get.colours.in.order(c(), c('DEF','ABC'), c('red', 'green'));
+        expect_true(setequal(result, list(colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC'))));
+
+        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c('red','green'));
+        expect_true(setequal(result, list(colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC'))));
+
+        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c('red'));
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('DEF', 'ABC'));
+        expect_true(result$colours['DEF'] == 'red');
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
+
+        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c(NULL,'red'));
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(result$colours['DEF'] == 'red');
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
+
+        result <- get.colours.in.order(c('ABC','DEF'), c('DEF','ABC'), c('red',NULL));
+        expect_equal(names(result), c('colours', 'value.order'));
+        expect_equal(names(result$colours), c('DEF','ABC'));
+        expect_true(result$colours['DEF'] == 'red');
+        expect_true(!is.na(result$colours['ABC']) && nzchar(result$colours['ABC']));
+        expect_equal(result$value.order, c('DEF','ABC'));
+
+        result <- get.colours.in.order(c('ABC'), c('DEF','ABC'), c('red','green'));
+        expect_equal(result, list(colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC')));
+
+        result <- get.colours.in.order(c(NULL, 'ABC'), c('DEF','ABC'), c('red','green'));
+        expect_equal(result, list(colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC')));
+
+        result <- get.colours.in.order(c('ABC', NULL), c('DEF','ABC'), c('red','green'));
+        expect_equal(result, list(colours = c(DEF = 'red',ABC = 'green'), value.order = c('DEF','ABC')));
     });
