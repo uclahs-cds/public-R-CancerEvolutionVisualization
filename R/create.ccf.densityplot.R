@@ -19,9 +19,12 @@ create.ccf.densityplot <- function(
     ...
     ) {
 
+    x$clone.id <- factor(x$clone.id);
+
     if (is.null(clone.colours)) {
         clone.colours <- get.colours(x$clone.id, return.names = TRUE);
         }
+    clone.colours <- clone.colours[as.character(sort(unique(x$clone.id)))];
 
     mean.ccf <- aggregate(CCF ~ clone.id, data = x, FUN = mean);
     nsnv <- aggregate(SNV.id ~ clone.id, data = x, FUN = length);
@@ -38,16 +41,19 @@ create.ccf.densityplot <- function(
     density.df <- do.call(rbind, density.list);
     density.df$y <- density.df$y * (nsnv$SNV.id[match(density.df$clone.id, nsnv$clone.id)] / nrow(x));
 
-    legend.label <- sapply(names(clone.colours), function(k) {
-        nsnv <- nsnv[nsnv$clone.id == k, ]$SNV.id;
-        return(paste0(k, ' (', nsnv, ')'));
+    clones.to.plot <- sort(intersect(names(clone.colours), nsnv$clone.id));
+    legend.label <- sapply(clones.to.plot, function(k) {
+        nsnv.count <- nsnv[nsnv$clone.id == k, ]$SNV.id;
+        return(paste0(k, ' (', nsnv.count, ')'));
         });
+    legend.colours <- clone.colours[clones.to.plot];
+
     clone.legend <- BoutrosLab.plotting.general::legend.grob(
         list(
             legend = list(
                 title = 'Clone (SNVs)',
-                labels = legend.label[names(clone.colours)],
-                colours = c(clone.colours),
+                labels = legend.label,
+                colours = legend.colours,
                 border = 'black'
                 )
             ),
@@ -70,6 +76,7 @@ create.ccf.densityplot <- function(
         xlimits = xlimits,
         xat = xat,
         ylimits = c(-0.05, 1.05) * ymax,
+        breaks = breaks,
         legend = list(inside = list(
             fun = clone.legend,
             x = legend.x,
