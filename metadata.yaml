@@ -12,3 +12,5 @@ Languages:
 Dependencies:
   - BPG
 References: ''
+image_name: 'cev'
+version: '3.0.0'

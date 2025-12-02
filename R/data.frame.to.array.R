@@ -2,7 +2,8 @@ data.frame.to.array <- function(
     DF,
     value = 'CCF',
     x.axis = 'SNV.id',
-    y.axis = 'ID'
+    y.axis = 'ID',
+    keep.na = FALSE
     ) {
 
     required.cols <- c(value, x.axis, y.axis);
@@ -28,11 +29,8 @@ data.frame.to.array <- function(
     arr             <- as.matrix(arr[, (-1)]);
     rownames(arr)   <- rows;
     colnames(arr)   <- cols;
-    arr[is.na(arr)] <- 0;
-
-    if (!is.null(levels(DF[, y.axis])) & ncol(arr) > 1) {
-        arr <- arr[, levels(DF[, y.axis])];
+    if (!keep.na) {
+        arr[is.na(arr)] <- 0;
         }
-
     return(arr);
     }

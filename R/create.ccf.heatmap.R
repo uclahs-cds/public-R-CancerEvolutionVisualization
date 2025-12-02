@@ -15,7 +15,7 @@ create.ccf.heatmap <- function(
         yaxis.lab <- colnames(x);
         }
 
-    col.labels <- seq(min(x), max(x), length.out = 5);
+    col.labels <- seq(min(x, na.rm = TRUE), max(x, na.rm = TRUE), length.out = 5);
 
     return(BoutrosLab.plotting.general::create.heatmap(
         x = x,

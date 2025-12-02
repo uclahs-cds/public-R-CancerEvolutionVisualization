@@ -172,7 +172,7 @@ create.clone.genome.distribution.plot.per.sample <- function(
 
     # create multipanel plot ----------------------------------------------------------------------
     # automate plot sizing based on cumber of clones in the scatter plot
-    height.scatter <- 0.5 * length(unique(sample.df$clone.id));
+    height.scatter <- 0.75 * length(unique(sample.df$clone.id));
     total.height <- height.scatter + 5;
 
     if (legend.x > 1) {

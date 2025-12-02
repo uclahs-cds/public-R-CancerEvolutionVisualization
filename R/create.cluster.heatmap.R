@@ -18,6 +18,7 @@ create.cluster.heatmap <- function(
     y.spacing = 1,
     colour.scheme = c('white', 'blue'),
     plot.objects.heights = c(1, 0.2),
+    keep.na = FALSE,
     ...
     ) {
 
@@ -38,21 +39,17 @@ create.cluster.heatmap <- function(
         }
     DF        <- droplevels(DF)[order(DF$clone.id, -abs(DF$CCF)), ];
     snv.order <- unique(DF[, c('SNV.id', 'clone.id')]);
-    arr       <- data.frame.to.array(DF);
-    arr       <- arr[snv.order$SNV.id, rev(levels(DF$ID))];
+    arr       <- data.frame.to.array(DF, keep.na = keep.na);
+    arr       <- arr[snv.order$SNV.id, rev(levels(DF$ID)), drop = FALSE];
 
     if (!is.null(xaxis.col)) {
-        xaxis.label <- unique(DF[DF$SNV.id %in% rownames(arr), xaxis.col]);
+        unique.dt <- unique(DF[DF$SNV.id %in% rownames(arr), c('SNV.id', xaxis.col)]);
+        xaxis.label <- unique.dt[, xaxis.col];
     } else {
         xaxis.label <- NULL;
         }
 
-    if (!is.matrix(arr)) {
-        arr <- t(arr);
-        yaxis.label <- levels(DF$ID);
-    } else {
-        yaxis.label <- colnames(arr);
-        }
+    yaxis.label <- colnames(arr);
 
     if (!is.null(ccf.limits)) {
         if (length(ccf.limits) != 2) {
@@ -61,12 +58,14 @@ create.cluster.heatmap <- function(
         arr[arr < ccf.limits[1]] <- ccf.limits[1];
         arr[arr > ccf.limits[2]] <- ccf.limits[2];
         }
+    if (any(dim(arr) == 1)) arr <- t(arr);
 
     hm <- create.ccf.heatmap(
         x = arr,
         cluster.dimensions = 'none',
         xlab.label = '',
-        xaxis.lab = xaxis.label,
+        xaxis.lab = NULL,
+        xaxis.cex = 0,
         yaxis.lab = yaxis.label,
         colour.scheme = colour.scheme,
         ...
@@ -76,6 +75,7 @@ create.cluster.heatmap <- function(
         x = t(clone.colours[snv.order$clone.id]),
         xlab.label = xlab.label,
         xlab.cex =  xlab.cex,
+        xaxis.lab = xaxis.label,
         xaxis.cex = xaxis.cex,
         xaxis.fontface = xaxis.fontface,
         input.colours = TRUE,
@@ -89,7 +89,7 @@ create.cluster.heatmap <- function(
         list(
             legend = list(
                 title = 'CCF',
-                labels = c(signif(min(arr), 2), rep('', legend.size), signif(max(arr), 2)),
+                labels = c(signif(min(arr, na.rm = TRUE), 2), rep('', legend.size), signif(max(arr, na.rm = TRUE), 2)),
                 colours = colour.scheme,
                 border = 'black',
                 continuous = TRUE,

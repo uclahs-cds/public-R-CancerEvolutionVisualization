@@ -12,6 +12,7 @@ create.ccf.densityplot <- function(
     legend.label.cex = 1,
     legend.x = 0.8,
     legend.y = 0.9,
+    text.spacing = 0.11,
     height = 6,
     width = 10,
     size.units = 'in',
@@ -24,6 +25,7 @@ create.ccf.densityplot <- function(
         }
 
     mean.ccf <- aggregate(CCF ~ clone.id, data = x, FUN = mean);
+    mean.ccf <- mean.ccf[order(mean.ccf$CCF), ];
     nsnv <- aggregate(SNV.id ~ clone.id, data = x, FUN = length);
 
     density.list <- list();
@@ -78,6 +80,13 @@ create.ccf.densityplot <- function(
         ...
         );
 
+    text.x.pos <- mean.ccf$CCF;
+    too.close <- which(diff(text.x.pos) < text.spacing);
+    if (length(too.close) > 0) {
+        text.x.pos[too.close] <- text.x.pos[too.close] - (text.spacing / 2);
+        text.x.pos[too.close + 1] <- text.x.pos[too.close + 1] + (text.spacing / 2);
+        }
+
     scatter <- BoutrosLab.plotting.general::create.scatterplot(
         formula = y ~ x,
         data = density.df,
@@ -93,7 +102,7 @@ create.ccf.densityplot <- function(
         abline.col = 'gray50',
         add.text = TRUE,
         text.labels = lapply(mean.ccf$CCF, round, 2),
-        text.x = mean.ccf$CCF,
+        text.x = text.x.pos,
         text.y = ymax,
         text.fontface = 'bold',
         text.cex = legend.title.cex

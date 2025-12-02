@@ -1,0 +1,39 @@
+ARG MINIFORGE_VERSION=23.3.1-1
+ARG UBUNTU_VERSION=23.10
+ARG CEV_VERSION=3.0.0
+
+FROM condaforge/mambaforge:${MINIFORGE_VERSION} AS builder
+
+# Use mamba to install tools and dependencies into /usr/local
+RUN mamba create -qy -p /usr/local \
+    -c r \
+    -c conda-forge \
+    python=3.10.7 \
+    r-data.table=1.14.8 \
+    r-base=4.3.1 \
+    r-devtools=2.4.5
+
+RUN R -q -e 'install.packages(c("gridExtra", "gtable", "testthat", "rmarkdown", "knitr", "devtools"), repos = "http://cran.us.r-project.org", lib = "/usr/local/lib/R/library", dependencies = TRUE)'
+
+# Install BoutrosLab.plotting.general from GitHub
+RUN R -q -e 'devtools::install_github("uclahs-cds/package-BoutrosLab-plotting-general", lib = "/usr/local/lib/R/library")'
+
+RUN mkdir -p /usr/local/CancerEvolutionVisualization
+COPY . /usr/local/CancerEvolutionVisualization
+RUN cd /usr/local/CancerEvolutionVisualization && \
+    R CMD build . && \
+    R -q -e 'install.packages("CancerEvolutionVisualization_'${CEV_VERSION}'.tar.gz", lib="/usr/local/lib/R/library", repos=NULL, type="source")'
+
+# Deploy the target tools into a base image
+FROM ubuntu:${UBUNTU_VERSION} AS final
+COPY --from=builder /usr/local /usr/local
+
+# Add a new user/group called bldocker
+RUN groupadd -g 500001 bldocker && \
+    useradd -r -u 500001 -g bldocker bldocker
+
+# Change the default user to bldocker from root
+USER bldocker
+
+LABEL maintainer="Helena Winata <hwinata@mednet.ucla.edu>" \
+    org.opencontainers.image.source=https://github.com/uclahs-cds/package-CancerEvolutionVisualization
