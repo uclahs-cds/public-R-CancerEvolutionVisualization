@@ -110,6 +110,26 @@ make.clone.tree.grobs <- function(
         );
 
     clone.out$no.ccf <- no.ccf;
+
+    # Rotate node positions and branch angles for fish plots (with CP data) when start.angle is non-zero
+    # This ensures branches and nodes rotate along with the polygons
+    if (!no.ccf && start.angle != 0) {
+        # Rotate all node positions
+        rotated.nodes <- rotate.coords(
+            x = clone.out$v$x,
+            y = clone.out$v$y,
+            rotate.by = start.angle,
+            x.origin = 0,
+            y.origin = 0
+            );
+        clone.out$v$x <- rotated.nodes$x;
+        clone.out$v$y <- rotated.nodes$y;
+
+        # Rotate branch angles to match the rotated coordinate system
+        # Note: rotate.coords negates the angle internally, so we add the original start.angle
+        clone.out$tree$angle <- clone.out$tree$angle + start.angle;
+        }
+
     plot.size <- calculate.main.plot.size(
         clone.out,
         scale1,
@@ -119,7 +139,7 @@ make.clone.tree.grobs <- function(
         );
 
     if (!no.ccf) {
-        get.CP.polygons(clone.out);
+        get.CP.polygons(clone.out, start.angle = start.angle);
         }
 
     add.tree.segs(
