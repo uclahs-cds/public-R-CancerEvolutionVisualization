@@ -126,7 +126,8 @@ SRCGrob <- function(
         scale.bar.coords = scale.bar.coords,
         scale.size.1 = scale.size.1,
         scale.size.2 = scale.size.2,
-        scale.padding = scale.padding
+        scale.padding = scale.padding,
+        plotting.direction = plotting.direction
         );
 
     out.tree <- gTree(

@@ -16,9 +16,28 @@ calculate.main.plot.size <- function(
     ) {
 
     padding <- 2 * node.radius / scale1;
-    ymax <- clone.out$v$y[which.max(abs(clone.out$v$y))];
-	ymax <- ymax + (- sign(ymax) * padding);
-    height <- ymax * scale1;
+    # ymax <- clone.out$v$y[which.max(abs(clone.out$v$y))];
+	# ymax <- ymax + (- sign(ymax) * padding);
+    # height <- ymax * scale1;
+	if (!is.null(clone.out$clones) && length(clone.out$clones) > 0) {                             
+	    # Get all polygon y coordinates          
+	    all.poly.y <- unlist(lapply(clone.out$clones, function(cl) cl$y));                        
+	    # Combine with node y coordinates        
+	    all.y <- c(clone.out$v$y, all.poly.y);   
+	} else {                                     
+	    # Original logic for non-fish plots      
+	    all.y <- clone.out$v$y;                                     
+    	}
+	ymin <- min(all.y)
+	ymax <- max(all.y)
+	# y.center <- (ymax + ymin)/2
+	# half_height <- (ymax - ymin)/2
+	# ylims <- c(y_center + half_height, y_center - half_height)
+	ylims <- c(
+		ymax + (- sign(ymax) * padding/2),
+		ymin - (- sign(ymin) * padding/2)
+		)
+	height <- (max(ylims) - min(ylims)) * scale1;
 
     if (is.null(min.width)) {
         xmax <- wid;
@@ -28,19 +47,23 @@ calculate.main.plot.size <- function(
             xmax / 2 + padding
             );
     } else {
-        xmin <- min(c(clone.out$v$x));
-        xmax <- max(c(clone.out$v$x));
-        xlims <- c(xmin, xmax);
+		all.x <- clone.out$v$x; 
+        xmin <- min(all.x);
+        xmax <- max(all.x);
 
+        xlims <- c(
+            xmin - (sign(xmin) * padding / 2),
+            xmax - (sign(xmax) * padding / 2)
+            )
         width <- (max(xlims) - min(xlims)) * scale1;
         diff <- min.width - width;
         if (diff > 0) {
             xmin <- xmin - 0.5 * diff / scale1
             xmax <- xmax + 0.5 * diff / scale1;
             xlims <- c(
-                xmin - padding,
-                xmax + padding
-                );
+				xmin - (sign(xmin) * padding),
+				xmax - (sign(xmax) * padding)
+				)
 
             width <- (max(xlims) - min(xlims)) * scale1;
             }
@@ -49,11 +72,12 @@ calculate.main.plot.size <- function(
     clone.out$height <- height;
     clone.out$width <- width;
     clone.out$xlims <- xlims;
-	clone.out$ymax <- ymax;
+    clone.out$ylims <- ylims;
+	# clone.out$ymax <- ymax;
 
 	clone.out$vp <- make.plot.viewport(
 	    clone.out,
-	    clip = if (clone.out$no.ccf) 'off' else 'on'
+	    clip = 'off' #if (clone.out$no.ccf) 'off' else 'on'
 	    );
     }
 
@@ -70,7 +94,8 @@ make.plot.viewport <- function(
 	    width = unit(clone.out$width, 'inches'),
 	    name = 'plot.vp',
 	    xscale = clone.out$xlims,
-	    yscale = c(clone.out$ymax, 0),
+	    yscale = clone.out$ylims,
+	    # yscale = c(clone.out$ymax, 0),
 	    just = just,
 	    gp = gpar(fill = 'pink'),
 	    clip = clip
@@ -91,6 +116,12 @@ add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, 
     if (axis.position == 'bottom') {
         d <- 'y';
         just <- c('centre', 'top');
+        rot <- 0;
+        x <- unit(0.5, 'npc');
+        y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.75;
+	} else if (axis.position == 'top') {
+        d <- 'y';
+        just <- c('centre', 'bottom');
         rot <- 0;
         x <- unit(0.5, 'npc');
         y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.75;
@@ -162,17 +193,22 @@ add.axes <- function(
     yaxis2.label = NULL,
     no.ccf = FALSE,
     axis.label.cex = list(x = 1.55, y = 1.55),
-    axis.cex = list(x = 1, y = 1)
+    axis.cex = list(x = 1, y = 1),
+    plotting.direction = 'down'
     ) {
 
-	if (!no.ccf && 'ccf' %in% colnames(clone.out$v) && all(!is.na(clone.out$v$ccf))) {
+    # Skip x-axis if plotting.direction is numeric (custom angle)
+    draw.xaxis <- !is.numeric(plotting.direction);
+
+	if (!no.ccf && 'ccf' %in% colnames(clone.out$v) && all(!is.na(clone.out$v$ccf)) && draw.xaxis) {
 		add.xaxis(
 		    clone.out,
 		    scale1 = scale1,
 		    axis.label = xaxis.label,
 		    no.ccf = no.ccf,
 		    axis.label.cex = axis.label.cex[['x']],
-		    axis.cex = axis.cex[['x']]
+		    axis.cex = axis.cex[['x']],
+		    plotting.direction = plotting.direction
 		    );
 	    }
 
@@ -287,8 +323,20 @@ add.xaxis <- function(
     axis.label = 'CCF',
     no.ccf = FALSE,
     axis.label.cex = 1.55,
-    axis.cex = 1
+    axis.cex = 1,
+    plotting.direction = 'down'
     ) {
+
+    # Determine axis position based on plotting direction
+    # down -> bottom, up -> top, left -> left, right -> right
+    axis.position <- switch(
+        as.character(plotting.direction),
+        'down' = 'bottom',
+        'up' = 'top',
+        'left' = 'left',
+        'right' = 'right',
+        'bottom'  # default
+        );
 
     # Necessary to get the right positioning
 	vp.unclipped <- make.plot.viewport(clone.out, clip = 'off');
@@ -298,41 +346,52 @@ add.xaxis <- function(
 	xat <- c(min(clone.widths), max(clone.widths));
 	xlabels <- c(0, paste0(round(max(clone.out$v$ccf) * 100, 0), '%'));
 
-	xaxis <- xaxisGrob(
-	    name = 'axis.content',
-	    at = xat,
-	    label = xlabels,
-	    gp = gpar(cex = axis.label.cex),
-	    main = TRUE
-	    );
+    # Create appropriate axis grob based on position
+    if (axis.position %in% c('left', 'right')) {
+        # For horizontal plots, use yaxisGrob
+        xaxis <- yaxisGrob(
+            name = 'axis.content',
+            at = xat,
+            label = xlabels,
+            gp = gpar(cex = axis.label.cex),
+            main = (axis.position == 'left')
+            );
+    } else {
+        # For vertical plots, use xaxisGrob
+        xaxis <- xaxisGrob(
+            name = 'axis.content',
+            at = xat,
+            label = xlabels,
+            gp = gpar(cex = axis.label.cex),
+            main = (axis.position == 'bottom')
+            );
 
-	# Move the labels up slightly
-	xaxis.labels <- editGrob(
-	    getGrob(xaxis, 'labels'),
-	    y = unit(-0.09, 'npc'),
-	    vjust = 1
-	    );
+        # Move the labels slightly for bottom position
+        if (axis.position == 'bottom') {
+            xaxis.labels <- editGrob(
+                getGrob(xaxis, 'labels'),
+                y = unit(-0.09, 'npc'),
+                vjust = 1
+                );
+            xaxis <- setGrob(xaxis, 'labels', xaxis.labels);
+            }
+        }
 
-	xaxis <- setGrob(
-	    xaxis,
-	    'labels',
-	    xaxis.labels
-	    );
-
-	if (diff(xat) / scale1 != clone.out$width) {
-	    # Extending the axis line beyond the clone limits
-		xaxis <- extend.axis(
-		    xaxis,
-		    limits = unit(clone.out$xlims,'native'),
-		    type = 'x'
-		    );
-	    }
+	# if (diff(xat) / scale1 != clone.out$width) {
+	#     # Extending the axis line beyond the clone limits
+    #     axis.type <- if (axis.position %in% c('left', 'right')) 'y' else 'x';
+	# 	xaxis <- extend.axis(
+	# 	    xaxis,
+	# 	    limits = unit(clone.out$xlims, 'native'),
+	# 	    type = axis.type
+	# 	    );
+	#     }
 
 	# Add the axis label
 	xaxis.gTree <- add.axis.label(
 	    xaxis,
 	    axis.label,
-	    axis.position = 'bottom',
+	    axis.position = axis.position,
 	    axis.label.cex,
 	    vp = vp.unclipped
 	    );

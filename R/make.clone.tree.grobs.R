@@ -179,7 +179,8 @@ make.clone.tree.grobs <- function(
         no.ccf = no.ccf,
         xaxis.label = xaxis.label,
         yaxis1.label = yaxis1.label,
-        yaxis2.label = yaxis2.label
+        yaxis2.label = yaxis2.label,
+        plotting.direction = list(...)$plotting.direction
         );
 
     if (scale.bar) {
