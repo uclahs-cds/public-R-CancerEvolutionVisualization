@@ -10,13 +10,13 @@ save.plot <- function(
     supported.extensions <- c('png', 'pdf', 'tiff', 'svg');
     f <- check.file.extension(filename, supported.extensions, 'tiff');
     if (f$ext == 'png') {
-        png(file = f$name, units = units, res = res, bg = bg, ...);
+        png(filename = f$name, units = units, res = res, bg = bg, ...);
     } else if (f$ext == 'tiff') {
-        tiff(file = f$name, units = units, res = res, bg = bg, ...);
+        tiff(filename = f$name, units = units, res = res, bg = bg, ...);
     } else if (f$ext == 'pdf') {
         pdf(file = f$name, ...);
     } else if (f$ext == 'svg') {
-        svg(file = f$name, bg = bg, ...);
+        svg(filename = f$name, bg = bg, ...);
         }
 
     grid.newpage();
