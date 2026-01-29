@@ -5,12 +5,11 @@ import(BoutrosLab.plotting.general)
 
 importFrom("graphics", "par", "strheight", "strwidth")
 importFrom("grDevices", "dev.list", "rainbow")
-importFrom("utils", "read.table", "vi", "head", "tail")
-importFrom("stats", "median", "setNames", "aggregate", "reshape", "rnorm", "runif")
+importFrom("utils", "read.table", "vi", "head")
+importFrom("stats", "median", "setNames", "aggregate", "reshape")
 importFrom(
     "grDevices",
     "col2rgb",
-    "rgb",
     "dev.off",
     "pdf",
     "png",
@@ -18,6 +17,7 @@ importFrom(
     "tiff",
     "colorRampPalette"
     )
+
 export(SRCGrob)
 export(create.phylogenetic.tree)
 export(create.ccf.heatmap)

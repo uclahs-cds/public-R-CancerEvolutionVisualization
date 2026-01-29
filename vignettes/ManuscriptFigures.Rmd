@@ -2,13 +2,10 @@
 title: 'Reproducing Manuscript Figures'
 date: '`r Sys.Date()`'
 author: 'Helena Winata'
-output: 
-  html_document:
-    toc: true
-    number_sections: false
+output: rmarkdown::pdf_document
 vignette: > 
   %\VignetteIndexEntry{Reproducing Manuscript Figures}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 

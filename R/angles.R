@@ -35,7 +35,7 @@ calculate.angles.radial <- function(
                 level.spread <- calculate.level.spread(v$spread[v$id %in% child.ids]);
                 level.total.angle <- total.angle * level.spread;
 
-                angles <- divide.equal.angle(
+                angles <- split.equal.angle(
                     base.total.angle = total.angle,
                     level.total.angle = level.total.angle,
                     child.ids = child.ids,
@@ -55,7 +55,7 @@ calculate.angles.radial <- function(
                 # sort children by complexity
                 child.ids <- v$id[v$id %in% child.ids];
                 # if all children are dendrogram, spread evenly by x distance
-                angles <- divide.equal.x.dist(
+                angles <- split.equal.x.dist(
                     current.node.id = current.node.id,
                     child.ids = child.ids,
                     angles = angles,
@@ -72,7 +72,7 @@ calculate.angles.radial <- function(
     return(angles);
     }
 
-divide.equal.angle <- function(
+split.equal.angle <- function(
     base.total.angle,
     level.total.angle,
     child.ids,
@@ -105,7 +105,7 @@ divide.equal.angle <- function(
     return(angles);
     }
 
-divide.equal.x.dist <- function(
+split.equal.x.dist <- function(
     current.node.id,
     child.ids,
     angles,
