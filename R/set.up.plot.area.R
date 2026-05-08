@@ -12,61 +12,42 @@ calculate.main.plot.size <- function(
     scale1,
     wid,
     min.width,
-    node.radius
+    node.radius,
+    plotting.direction = 'down'
     ) {
 
     padding <- 2 * node.radius / scale1;
-    # ymax <- clone.out$v$y[which.max(abs(clone.out$v$y))];
-	# ymax <- ymax + (- sign(ymax) * padding);
-    # height <- ymax * scale1;
-	if (!is.null(clone.out$clones) && length(clone.out$clones) > 0) {                             
-	    # Get all polygon y coordinates          
-	    all.poly.y <- unlist(lapply(clone.out$clones, function(cl) cl$y));                        
-	    # Combine with node y coordinates        
-	    all.y <- c(clone.out$v$y, all.poly.y);   
-	} else {                                     
-	    # Original logic for non-fish plots      
-	    all.y <- clone.out$v$y;                                     
-    	}
-	ymin <- min(all.y)
-	ymax <- max(all.y)
-	# y.center <- (ymax + ymin)/2
-	# half_height <- (ymax - ymin)/2
-	# ylims <- c(y_center + half_height, y_center - half_height)
-	ylims <- c(
-		ymax + (- sign(ymax) * padding/2),
-		ymin - (- sign(ymin) * padding/2)
-		)
-	height <- (max(ylims) - min(ylims)) * scale1;
 
-    if (is.null(min.width)) {
-        xmax <- wid;
-        width <- wid * scale1 + 4 * node.radius;
-        xlims <- c(
-            -(xmax / 2) - padding,
-            xmax / 2 + padding
-            );
-    } else {
-		all.x <- clone.out$v$x; 
-        xmin <- min(all.x);
-        xmax <- max(all.x);
+    all.x <- clone.out$v$x;
+    all.y <- clone.out$v$y;
+    if (!is.null(clone.out$clones) && length(clone.out$clones) > 0) {
+        all.x <- c(all.x, unlist(lapply(clone.out$clones, function(cl) cl$x)));
+        all.y <- c(all.y, unlist(lapply(clone.out$clones, function(cl) cl$y)));
+        }
 
-        xlims <- c(
-            xmin - (sign(xmin) * padding / 2),
-            xmax - (sign(xmax) * padding / 2)
-            )
-        width <- (max(xlims) - min(xlims)) * scale1;
-        diff <- min.width - width;
-        if (diff > 0) {
-            xmin <- xmin - 0.5 * diff / scale1
-            xmax <- xmax + 0.5 * diff / scale1;
-            xlims <- c(
-				xmin - (sign(xmin) * padding),
-				xmax - (sign(xmax) * padding)
-				)
+    xmin <- min(all.x);
+    xmax <- max(all.x);
+    ymin <- min(all.y);
+    ymax <- max(all.y);
 
-            width <- (max(xlims) - min(xlims)) * scale1;
-            }
+    # Remove padding on the axis edge so the CCF axis grob sits flush
+    # against the polygon tip. Numeric angles have no defined axis side.
+    pad.bottom <- if (is.character(plotting.direction) && plotting.direction == 'down')  0 else padding;
+    pad.top    <- if (is.character(plotting.direction) && plotting.direction == 'up')    0 else padding;
+    pad.left   <- if (is.character(plotting.direction) && plotting.direction == 'left')  0 else padding;
+    pad.right  <- if (is.character(plotting.direction) && plotting.direction == 'right') 0 else padding;
+
+    xlims <- c(xmin - pad.left,   xmax + pad.right);
+    ylims <- c(ymax + pad.bottom, ymin - pad.top);
+
+    width  <- (xmax - xmin + pad.left + pad.right)  * scale1;
+    height <- (ymax - ymin + pad.bottom + pad.top) * scale1;
+
+    if (!is.null(min.width) && width < min.width) {
+        expand   <- (min.width - width) / (2 * scale1);
+        xlims[1] <- xlims[1] - expand;
+        xlims[2] <- xlims[2] + expand;
+        width    <- min.width;
         }
 
     clone.out$height <- height;
@@ -377,15 +358,15 @@ add.xaxis <- function(
             }
         }
 
-	# if (diff(xat) / scale1 != clone.out$width) {
-	#     # Extending the axis line beyond the clone limits
-    #     axis.type <- if (axis.position %in% c('left', 'right')) 'y' else 'x';
-	# 	xaxis <- extend.axis(
-	# 	    xaxis,
-	# 	    limits = unit(clone.out$xlims, 'native'),
-	# 	    type = axis.type
-	# 	    );
-	#     }
+    # Extend the axis line to the full viewport extent so it touches
+    # the polygon flat edge and extends slightly past it on both sides
+    axis.type   <- if (axis.position %in% c('left', 'right')) 'y' else 'x';
+    axis.limits <- if (axis.position %in% c('left', 'right')) {
+        unit(clone.out$ylims, 'native')
+    } else {
+        unit(clone.out$xlims, 'native')
+        };
+    xaxis <- extend.axis(xaxis, axis.limits, type = axis.type);
 
 	# Add the axis label
 	xaxis.gTree <- add.axis.label(
