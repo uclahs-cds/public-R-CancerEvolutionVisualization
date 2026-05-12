@@ -41,6 +41,7 @@ make.clone.tree.grobs <- function(
     scale.size.1,
     scale.size.2,
     scale.padding,
+    plotting.direction = 'down',
     ...
     ) {
     #initializing dataframe for subclones
@@ -145,7 +146,7 @@ make.clone.tree.grobs <- function(
         wid,
         min.width,
         node.radius,
-        plotting.direction = list(...)$plotting.direction
+        start.angle = start.angle
         );
 
     if (!no.ccf) {
@@ -190,7 +191,7 @@ make.clone.tree.grobs <- function(
         xaxis.label = xaxis.label,
         yaxis1.label = yaxis1.label,
         yaxis2.label = yaxis2.label,
-        plotting.direction = list(...)$plotting.direction
+        plotting.direction = plotting.direction
         );
 
     if (scale.bar) {

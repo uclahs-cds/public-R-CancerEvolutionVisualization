@@ -13,7 +13,7 @@ calculate.main.plot.size <- function(
     wid,
     min.width,
     node.radius,
-    plotting.direction = 'down'
+    start.angle = 0
     ) {
 
     padding <- 2 * node.radius / scale1;
@@ -31,11 +31,12 @@ calculate.main.plot.size <- function(
     ymax <- max(all.y);
 
     # Remove padding on the axis edge so the CCF axis grob sits flush
-    # against the polygon tip. Numeric angles have no defined axis side.
-    pad.bottom <- if (is.character(plotting.direction) && plotting.direction == 'down')  0 else padding;
-    pad.top    <- if (is.character(plotting.direction) && plotting.direction == 'up')    0 else padding;
-    pad.left   <- if (is.character(plotting.direction) && plotting.direction == 'left')  0 else padding;
-    pad.right  <- if (is.character(plotting.direction) && plotting.direction == 'right') 0 else padding;
+    # against the polygon tip. Non-cardinal angles have no defined axis side.
+    tol <- 1e-9;
+    pad.bottom <- 0 #if (abs(start.angle)        < tol) 0 else padding;
+    pad.top    <- 0 #if (abs(start.angle - pi)   < tol) 0 else padding;
+    pad.right  <- 0 #if (abs(start.angle - pi/2) < tol) 0 else padding;
+    pad.left   <- 0 #if (abs(start.angle + pi/2) < tol) 0 else padding;
 
     xlims <- c(xmin - pad.left,   xmax + pad.right);
     ylims <- c(ymax + pad.bottom, ymin - pad.top);
@@ -54,12 +55,12 @@ calculate.main.plot.size <- function(
     clone.out$width <- width;
     clone.out$xlims <- xlims;
     clone.out$ylims <- ylims;
-	# clone.out$ymax <- ymax;
+    # clone.out$ymax <- ymax;
 
-	clone.out$vp <- make.plot.viewport(
-	    clone.out,
-	    clip = 'off' #if (clone.out$no.ccf) 'off' else 'on'
-	    );
+    clone.out$vp <- make.plot.viewport(
+        clone.out,
+        clip = 'off' #if (clone.out$no.ccf) 'off' else 'on'
+        );
     }
 
 make.plot.viewport <- function(
@@ -69,28 +70,28 @@ make.plot.viewport <- function(
     y = 0.5
     ) {
 
-	vp <- viewport(
-	    y = y,
-	    height = unit(clone.out$height, 'inches'),
-	    width = unit(clone.out$width, 'inches'),
-	    name = 'plot.vp',
-	    xscale = clone.out$xlims,
-	    yscale = clone.out$ylims,
-	    # yscale = c(clone.out$ymax, 0),
-	    just = just,
-	    gp = gpar(fill = 'pink'),
-	    clip = clip
-	    );
+    vp <- viewport(
+        y = y,
+        height = unit(clone.out$height, 'inches'),
+        width = unit(clone.out$width, 'inches'),
+        name = 'plot.vp',
+        xscale = clone.out$xlims,
+        yscale = clone.out$ylims,
+        # yscale = c(clone.out$ymax, 0),
+        just = just,
+        gp = gpar(fill = 'pink'),
+        clip = clip
+        );
 
-	return(vp);
+    return(vp);
     }
 
 extend.axis <- function(axisGrob, limits, type) {
-	arg.list <- list(getGrob(axisGrob, 'major'), limits);
-	names(arg.list) <- c('grob', type);
-	axisGrob <- setGrob(axisGrob, 'major', do.call(editGrob, arg.list));
+    arg.list <- list(getGrob(axisGrob, 'major'), limits);
+    names(arg.list) <- c('grob', type);
+    axisGrob <- setGrob(axisGrob, 'major', do.call(editGrob, arg.list));
 
-	return(axisGrob);
+    return(axisGrob);
     }
 
 add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, vp) {
@@ -100,66 +101,66 @@ add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, 
         rot <- 0;
         x <- unit(0.5, 'npc');
         y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.75;
-	} else if (axis.position == 'top') {
+    } else if (axis.position == 'top') {
         d <- 'y';
         just <- c('centre', 'bottom');
         rot <- 0;
         x <- unit(0.5, 'npc');
         y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.75;
-	} else {
-		pushViewport(vp);
+    } else {
+        pushViewport(vp);
 
-		tick.length  <- unit(
-		    diff(c(
-		        as.numeric(getGrob(axisGrob, 'ticks')$x0),
-		        as.numeric(getGrob(axisGrob, 'ticks')$x1)
-		        )),
-		    'lines'
-		    );
+        tick.length  <- unit(
+            diff(c(
+                as.numeric(getGrob(axisGrob, 'ticks')$x0),
+                as.numeric(getGrob(axisGrob, 'ticks')$x1)
+                )),
+            'lines'
+            );
 
-		y <-  convertY(
-		    unit(max(as.numeric(getGrob(axisGrob, 'major')$y)) * 0.5, 'native'),
-		    'inches'
-		    );
+        y <-  convertY(
+            unit(max(as.numeric(getGrob(axisGrob, 'major')$y)) * 0.5, 'native'),
+            'inches'
+            );
 
-		if (axis.position == 'left') {
-			d <- 'x';
-			just <- c('centre', 'centre');
-			rot <- 90;
+        if (axis.position == 'left') {
+            d <- 'x';
+            just <- c('right', 'centre');
+            rot <- 90;
 
-			x <- unit(
-			    convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) -
-			        convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
-			        convertX(getGrob(axisGrob, 'labels')$x * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
-			    'mm'
-			    );
-		} else if (axis.position == 'right') {
-			d <- 'x';
-			just <- c('left', 'centre');
-			x <- (getGrob(axisGrob, 'labels')$x + tick.length) * 1.5;
-			rot <- 270;
-		    }
+            x <- unit(
+                convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) -
+                    convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
+                    convertX(getGrob(axisGrob, 'labels')$x * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
+                'mm'
+                );
+        } else if (axis.position == 'right') {
+            d <- 'x';
+            just <- c('left', 'centre');
+            x <- (getGrob(axisGrob, 'labels')$x + tick.length) * 1.5;
+            rot <- 270;
+            }
 
-		popViewport()
-    	}
+        popViewport()
+        }
 
-	axis.lab <- textGrob(
-	    name = 'axis.label',
-	    axis.label,
-	    gp = gpar(cex = axis.label.cex),
-	    vjust = 0,
-	    x = x,
-	    rot = rot,
-	    y = y
-	    );
+    axis.lab <- textGrob(
+        name = 'axis.label',
+        axis.label,
+        gp = gpar(cex = axis.label.cex),
+        vjust = 0,
+        x = x,
+        rot = rot,
+        y = y
+        );
 
-	axis.gTree <- gTree(
-	    name = paste0('axis.', axis.position),
-	    children = gList(axis.lab, axisGrob),
-	    vp = vp
-	    );
+    axis.gTree <- gTree(
+        name = paste0('axis.', axis.position),
+        children = gList(axis.lab, axisGrob),
+        vp = vp
+        );
 
-	return(axis.gTree);
+    return(axis.gTree);
     }
 
 add.axes <- function(
@@ -181,60 +182,60 @@ add.axes <- function(
     # Skip x-axis if plotting.direction is numeric (custom angle)
     draw.xaxis <- !is.numeric(plotting.direction);
 
-	if (!no.ccf && 'ccf' %in% colnames(clone.out$v) && all(!is.na(clone.out$v$ccf)) && draw.xaxis) {
-		add.xaxis(
-		    clone.out,
-		    scale1 = scale1,
-		    axis.label = xaxis.label,
-		    no.ccf = no.ccf,
-		    axis.label.cex = axis.label.cex[['x']],
-		    axis.cex = axis.cex[['x']],
-		    plotting.direction = plotting.direction
-		    );
-	    }
+    if (!no.ccf && 'ccf' %in% colnames(clone.out$v) && all(!is.na(clone.out$v$ccf)) && draw.xaxis) {
+        add.xaxis(
+            clone.out,
+            scale1 = scale1,
+            axis.label = xaxis.label,
+            no.ccf = no.ccf,
+            axis.label.cex = axis.label.cex[['x']],
+            axis.cex = axis.cex[['x']],
+            plotting.direction = plotting.direction
+            );
+        }
 
     if (yaxis.position != 'none' & scale.bar == FALSE) {
         ylabels1 <- unlist(yat[1]);
         ylabels2 <- unlist(yat[2]);
 
         if (yaxis.position == 'both') {
-    		if (is.null(yaxis2.label)) {
-    			warning('Missing second y-axis label');
-    			yaxis2.label <- '';
-    		    }
+            if (is.null(yaxis2.label)) {
+                warning('Missing second y-axis label');
+                yaxis2.label <- '';
+                }
 
             conversion.factor <- scale1 / scale2
 
-    		ymax1 <- add.yaxis(
-    		    clone.out,
-    		    yaxis.position = 'left',
-    		    axis1.label = yaxis1.label,
-    		    no.ccf = no.ccf,
-    		    axis.label.cex = axis.label.cex[['y']],
-    		    axis.cex = axis.cex[['y']],
-    		    ylabels = ylabels1
-    		    );
+            ymax1 <- add.yaxis(
+                clone.out,
+                yaxis.position = 'left',
+                axis1.label = yaxis1.label,
+                no.ccf = no.ccf,
+                axis.label.cex = axis.label.cex[['y']],
+                axis.cex = axis.cex[['y']],
+                ylabels = ylabels1
+                );
 
-    		add.yaxis(
-    		    clone.out,
-    		    yaxis.position = 'right',
-    		    conversion.factor = conversion.factor,
-    		    axis1.label = yaxis2.label,
-    		    no.ccf = no.ccf,
-    		    axis.label.cex = axis.label.cex[['y']],
-    		    axis.cex = axis.cex[['y']],
-    		    ylabels = ylabels2
-    		    );
+            add.yaxis(
+                clone.out,
+                yaxis.position = 'right',
+                conversion.factor = conversion.factor,
+                axis1.label = yaxis2.label,
+                no.ccf = no.ccf,
+                axis.label.cex = axis.label.cex[['y']],
+                axis.cex = axis.cex[['y']],
+                ylabels = ylabels2
+                );
         } else {
-    		add.yaxis(
-    		    clone.out,
-    		    yaxis.position = yaxis.position,
-    		    axis1.label = yaxis1.label,
-    		    no.ccf = no.ccf,
-    		    axis.label.cex = axis.label.cex[['y']],
-    		    axis.cex = axis.cex[['y']],
-    		    ylabels = ylabels1
-    		    );
+            add.yaxis(
+                clone.out,
+                yaxis.position = yaxis.position,
+                axis1.label = yaxis1.label,
+                no.ccf = no.ccf,
+                axis.label.cex = axis.label.cex[['y']],
+                axis.cex = axis.cex[['y']],
+                ylabels = ylabels1
+                );
             }
         }
     }
@@ -254,48 +255,48 @@ add.yaxis <- function(
     # Necessary to get the right positioning
     vp.unclipped <- make.plot.viewport(clone.out, clip = 'off');
 
-	ymax <- clone.out$ymax;
+    ymax <- clone.out$ymax;
 
     # Set up tick labels
-	if (is.null(ylabels)) {
-		ylabels <- get.default.yat(ymax, conversion.factor);
-	    }
+    if (is.null(ylabels)) {
+        ylabels <- get.default.yat(ymax, conversion.factor);
+        }
 
-	y.ticks.at <- ylabels / conversion.factor;
+    y.ticks.at <- ylabels / conversion.factor;
 
-	if (length(ylabels) == 0 || length(y.ticks.at) == 0) {
+    if (length(ylabels) == 0 || length(y.ticks.at) == 0) {
         warning('No y-axis ticks to draw. Skipping axis rendering.');
         return(ymax);
         }
 
-	yaxis1 <- yaxisGrob(
-	    name = 'axis.content',
-	    at = y.ticks.at,
-	    label = ylabels,
-	    gp = gpar(cex = axis.cex),
-	    main = yaxis.position == 'left'
-	    );
+    yaxis1 <- yaxisGrob(
+        name = 'axis.content',
+        at = y.ticks.at,
+        label = ylabels,
+        gp = gpar(cex = axis.cex),
+        main = yaxis.position == 'left'
+        );
 
     if (max(y.ticks.at) / conversion.factor != ymax && !no.ccf) {
         # Extend the axis line beyond the last tick
-	    yaxis1 <- extend.axis(
-	        yaxis1,
-	        limits = unit(c(0, ymax), 'native'),
-	        type = 'y'
-	        );
+        yaxis1 <- extend.axis(
+            yaxis1,
+            limits = unit(c(0, ymax), 'native'),
+            type = 'y'
+            );
         }
 
-	yaxis.gTree <- add.axis.label(
-	    yaxis1,
-	    axis1.label,
-	    axis.position = yaxis.position,
-	    axis.label.cex,
-	    vp = vp.unclipped
-	    );
+    yaxis.gTree <- add.axis.label(
+        yaxis1,
+        axis1.label,
+        axis.position = yaxis.position,
+        axis.label.cex,
+        vp = vp.unclipped
+        );
 
-	clone.out$grobs <- c(clone.out$grobs, list(yaxis.gTree));
+    clone.out$grobs <- c(clone.out$grobs, list(yaxis.gTree));
 
-	return(ymax)
+    return(ymax)
     }
 
 add.xaxis <- function(
@@ -320,12 +321,12 @@ add.xaxis <- function(
         );
 
     # Necessary to get the right positioning
-	vp.unclipped <- make.plot.viewport(clone.out, clip = 'off');
+    vp.unclipped <- make.plot.viewport(clone.out, clip = 'off');
 
-	# Set up tick labels
-	clone.widths <- as.numeric(as.matrix(clone.out$v[, c('x1', 'x2')]));
-	xat <- c(min(clone.widths), max(clone.widths));
-	xlabels <- c(0, paste0(round(max(clone.out$v$ccf) * 100, 0), '%'));
+    # Set up tick labels
+    clone.widths <- as.numeric(as.matrix(clone.out$v[, c('x1', 'x2')]));
+    xat <- c(min(clone.widths), max(clone.widths));
+    xlabels <- c(0, paste0(round(max(clone.out$v$ccf) * 100, 0), '%'));
 
     # Create appropriate axis grob based on position
     if (axis.position %in% c('left', 'right')) {
@@ -337,6 +338,8 @@ add.xaxis <- function(
             gp = gpar(cex = axis.label.cex),
             main = (axis.position == 'left')
             );
+        clone.out$ylims <- unit(clone.out$ylims * 1.5, 'native')
+        xaxis <- extend.axis(xaxis, unit(clone.out$ylims, 'native'), type = 'y');
     } else {
         # For vertical plots, use xaxisGrob
         xaxis <- xaxisGrob(
@@ -346,38 +349,18 @@ add.xaxis <- function(
             gp = gpar(cex = axis.label.cex),
             main = (axis.position == 'bottom')
             );
-
-        # Move the labels slightly for bottom position
-        if (axis.position == 'bottom') {
-            xaxis.labels <- editGrob(
-                getGrob(xaxis, 'labels'),
-                y = unit(-0.09, 'npc'),
-                vjust = 1
-                );
-            xaxis <- setGrob(xaxis, 'labels', xaxis.labels);
-            }
+        xaxis <- extend.axis(xaxis, unit(clone.out$xlims, 'native'), type = 'x');
         }
+    # Add the axis label
+    xaxis.gTree <- add.axis.label(
+        xaxis,
+        axis.label,
+        axis.position = axis.position,
+        axis.label.cex,
+        vp = vp.unclipped
+        );
 
-    # Extend the axis line to the full viewport extent so it touches
-    # the polygon flat edge and extends slightly past it on both sides
-    axis.type   <- if (axis.position %in% c('left', 'right')) 'y' else 'x';
-    axis.limits <- if (axis.position %in% c('left', 'right')) {
-        unit(clone.out$ylims, 'native')
-    } else {
-        unit(clone.out$xlims, 'native')
-        };
-    xaxis <- extend.axis(xaxis, axis.limits, type = axis.type);
-
-	# Add the axis label
-	xaxis.gTree <- add.axis.label(
-	    xaxis,
-	    axis.label,
-	    axis.position = axis.position,
-	    axis.label.cex,
-	    vp = vp.unclipped
-	    );
-
-	clone.out$grobs <- c(clone.out$grobs, list(xaxis.gTree));
+    clone.out$grobs <- c(clone.out$grobs, list(xaxis.gTree));
     }
 
 add.main <- function(
@@ -388,43 +371,43 @@ add.main <- function(
     size.units = 'npc'
     ) {
 
-	# y.pos <- unit(1.08,'npc');
-	y.pos <- unit(0.5,'npc');
+    # y.pos <- unit(1.08,'npc');
+    y.pos <- unit(0.5,'npc');
 
-	if (!is.null(main.y)) {
-		pushViewport(clone.out$vp);
-		plot.top <- convertY(unit(1,'npc'), size.units, valueOnly = TRUE);
-		popViewport();
-		y.pos <- plot.top + main.y;
-		}
+    if (!is.null(main.y)) {
+        pushViewport(clone.out$vp);
+        plot.top <- convertY(unit(1,'npc'), size.units, valueOnly = TRUE);
+        popViewport();
+        y.pos <- plot.top + main.y;
+        }
 
-	main.label <- textGrob(
-	    main,
-	    just = 'center',
-	    gp = gpar(
-	        col = 'black',
-	        cex = main.cex
-	        ));
+    main.label <- textGrob(
+        main,
+        just = 'center',
+        gp = gpar(
+            col = 'black',
+            cex = main.cex
+            ));
 
-	main.grob <- gTree(
-	    children = gList(main.label),
-	    name = 'main.gtree',
-	    cl = 'main.label',
-	    vp = vpStack(
-	        make.plot.viewport(
-	            clone.out,
-	            clip = 'off',
-	            just = c('centre', 'centre')
-	            ),
-	        viewport(
-	            y = unit(y.pos, size.units),
-	            x = unit(0, 'native'),
-	            height = grobHeight(main.label),
-	            width = grobWidth(main.label),
-	            just = c('centre', 'bottom')
-	            )
-	        )
-	    );
+    main.grob <- gTree(
+        children = gList(main.label),
+        name = 'main.gtree',
+        cl = 'main.label',
+        vp = vpStack(
+            make.plot.viewport(
+                clone.out,
+                clip = 'off',
+                just = c('centre', 'centre')
+                ),
+            viewport(
+                y = unit(y.pos, size.units),
+                x = unit(0, 'native'),
+                height = grobHeight(main.label),
+                width = grobWidth(main.label),
+                just = c('centre', 'bottom')
+                )
+            )
+        );
 
-	clone.out$grobs <- c(clone.out$grobs, list(main.grob));
+    clone.out$grobs <- c(clone.out$grobs, list(main.grob));
     }
