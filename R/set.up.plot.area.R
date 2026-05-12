@@ -32,25 +32,30 @@ calculate.main.plot.size <- function(
 
     # Remove padding on the axis edge so the CCF axis grob sits flush
     # against the polygon tip. Non-cardinal angles have no defined axis side.
-    tol <- 1e-9;
-    pad.bottom <- 0 #if (abs(start.angle)        < tol) 0 else padding;
-    pad.top    <- 0 #if (abs(start.angle - pi)   < tol) 0 else padding;
-    pad.right  <- 0 #if (abs(start.angle - pi/2) < tol) 0 else padding;
-    pad.left   <- 0 #if (abs(start.angle + pi/2) < tol) 0 else padding;
+    # tol <- 1e-9;
+    # pad.bottom <- if (abs(start.angle)        < tol) 0 else padding;
+    # pad.top    <- if (abs(start.angle - pi)   < tol) 0 else padding;
+    # pad.right  <- if (abs(start.angle - pi/2) < tol) 0 else padding;
+    # pad.left   <- if (abs(start.angle + pi/2) < tol) 0 else padding;
 
-    xlims <- c(xmin - pad.left,   xmax + pad.right);
-    ylims <- c(ymax + pad.bottom, ymin - pad.top);
+    # xlims <- c(xmin - pad.left,   xmax + pad.right);
+    # ylims <- c(ymax + pad.bottom, ymin - pad.top);
 
-    width  <- (xmax - xmin + pad.left + pad.right)  * scale1;
-    height <- (ymax - ymin + pad.bottom + pad.top) * scale1;
+    # width  <- (xmax - xmin + pad.left + pad.right) * scale1;
+    # height <- (ymax - ymin + pad.bottom + pad.top) * scale1;
 
-    if (!is.null(min.width) && width < min.width) {
-        expand   <- (min.width - width) / (2 * scale1);
-        xlims[1] <- xlims[1] - expand;
-        xlims[2] <- xlims[2] + expand;
-        width    <- min.width;
-        }
+    xlims <- c(xmin, xmax);
+    ylims <- c(ymax, ymin);
 
+    width  <- (xmax - xmin) * scale1;
+    height <- (ymax - ymin) * scale1;
+
+    # if (!is.null(min.width) && width < min.width) {
+    #     expand   <- (min.width - width) / (2 * scale1);
+    #     xlims[1] <- xlims[1] - expand;
+    #     xlims[2] <- xlims[2] + expand;
+    #     width    <- min.width;
+    #     }
     clone.out$height <- height;
     clone.out$width <- width;
     clone.out$xlims <- xlims;
@@ -100,13 +105,13 @@ add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, 
         just <- c('centre', 'top');
         rot <- 0;
         x <- unit(0.5, 'npc');
-        y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.75;
+        y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.5;
     } else if (axis.position == 'top') {
         d <- 'y';
         just <- c('centre', 'bottom');
         rot <- 0;
         x <- unit(0.5, 'npc');
-        y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.75;
+        y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.5;
     } else {
         pushViewport(vp);
 
@@ -338,8 +343,8 @@ add.xaxis <- function(
             gp = gpar(cex = axis.label.cex),
             main = (axis.position == 'left')
             );
-        clone.out$ylims <- unit(clone.out$ylims * 1.5, 'native')
-        xaxis <- extend.axis(xaxis, unit(clone.out$ylims, 'native'), type = 'y');
+        # clone.out$ylims <- unit(clone.out$ylims * 1.5, 'native')
+        xaxis <- extend.axis(xaxis, unit(clone.out$ylims * 1.5, 'native'), type = 'y');
     } else {
         # For vertical plots, use xaxisGrob
         xaxis <- xaxisGrob(
@@ -349,7 +354,7 @@ add.xaxis <- function(
             gp = gpar(cex = axis.label.cex),
             main = (axis.position == 'bottom')
             );
-        xaxis <- extend.axis(xaxis, unit(clone.out$xlims, 'native'), type = 'x');
+        xaxis <- extend.axis(xaxis, unit(clone.out$xlims * 1.5, 'native'), type = 'x');
         }
     # Add the axis label
     xaxis.gTree <- add.axis.label(

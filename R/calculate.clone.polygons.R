@@ -34,7 +34,7 @@ make.polygon <- function(
     vaf <- wid;
 
 	beta <- len / beta.in;
-	y1 <- max(y0 + beta, y0 + 1);
+	y1 <- y0 + beta #max(y0 + beta, y0 + 1);
 	yy <- seq(y0, y1, length.out = 100);
 
     params.d  <- c(-0.7310133, sig.shape);
