@@ -101,38 +101,56 @@ extend.axis <- function(axisGrob, limits, type) {
 
 add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, vp) {
     if (axis.position == 'bottom') {
-        d <- 'y';
+        # d <- 'y';
         just <- c('centre', 'top');
         rot <- 0;
         x <- unit(0.5, 'npc');
         y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.5;
     } else if (axis.position == 'top') {
-        d <- 'y';
+        # d <- 'y';
         just <- c('centre', 'bottom');
         rot <- 0;
         x <- unit(0.5, 'npc');
-        y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.5;
+        y <- (getGrob(axisGrob, 'ticks')$y0) * 1.4;
+        # y <- unit(
+        #     # convertY(getGrob(axisGrob, 'labels')$y, 'mm', valueOnly = TRUE),
+        #         convertY(getGrob(axisGrob, 'ticks')$y0 * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
+        #         # convertY(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
+        #     'mm'
+        #     );
+        # x <- unit(
+        # convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) +
+        #     convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
+        #     convertX(getGrob(axisGrob, 'labels')$x * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
+        # 'mm'
+        # );
+
     } else {
         pushViewport(vp);
 
-        tick.length  <- unit(
-            diff(c(
-                as.numeric(getGrob(axisGrob, 'ticks')$x0),
-                as.numeric(getGrob(axisGrob, 'ticks')$x1)
-                )),
-            'lines'
-            );
-
-        y <-  convertY(
-            unit(max(as.numeric(getGrob(axisGrob, 'major')$y)) * 0.5, 'native'),
-            'inches'
-            );
-
+        tick.length  <- unit( 0.5, 'lines') * axisGrob$gp$cex;
+        #     diff(c(
+        #         (getGrob(axisGrob, 'ticks')$x0),
+        #         (getGrob(axisGrob, 'ticks')$x1)
+        #         )),
+        #     'lines'
+        #     );
+        # print((getGrob(axisGrob, 'ticks')$x0))
+        # print((getGrob(axisGrob, 'ticks')$x1))
+        # print(tick.length)
+        # y <- convertY(
+        #     unit(max(as.numeric(getGrob(axisGrob, 'major')$y)), 'native'),
+        #     'inches'
+        #     );
+        y <- unit(mean(as.numeric(getGrob(axisGrob, 'major')$y)), 'native')
+            
         if (axis.position == 'left') {
-            d <- 'x';
+            # d <- 'x';
             just <- c('right', 'centre');
             rot <- 90;
-
+        
+            # x <- getGrob(axisGrob, 'labels')$x + (tick.length * 1.5);
+            # x <- (getGrob(axisGrob, 'labels')$x + tick.length) * 1.5;
             x <- unit(
                 convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) -
                     convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
@@ -140,9 +158,15 @@ add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, 
                 'mm'
                 );
         } else if (axis.position == 'right') {
-            d <- 'x';
+            # d <- 'x';
             just <- c('left', 'centre');
-            x <- (getGrob(axisGrob, 'labels')$x + tick.length) * 1.5;
+            # x <- getGrob(axisGrob, 'labels')$x + (tick.length * 1.5);
+            x <- unit(
+                convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) +
+                    convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
+                    convertX(getGrob(axisGrob, 'labels')$x * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
+                'mm'
+                );
             rot <- 270;
             }
 
