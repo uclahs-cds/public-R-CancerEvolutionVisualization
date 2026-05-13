@@ -60,7 +60,7 @@ calculate.main.plot.size <- function(
     clone.out$width <- width;
     clone.out$xlims <- xlims;
     clone.out$ylims <- ylims;
-    # clone.out$ymax <- ymax;
+    clone.out$ymax <- ymax;
 
     clone.out$vp <- make.plot.viewport(
         clone.out,
