@@ -3,7 +3,6 @@ add.node.ellipse <- function(
     node.radius,
     label.nodes = NULL,
     label.cex = NA,
-    add.normal = FALSE,
     scale1,
     ...
     ) {
@@ -101,11 +100,11 @@ add.normal <- function(clone.out, node.radius, label.cex, normal.cex = 1) {
         vp = vpStack(
             make.plot.viewport(clone.out, clip = 'off'),
             viewport(
-                y = unit(1, 'npc') - unit(node.radius * normal.cex, 'inches'),
+                y = unit(0, 'native'),
                 x = unit(0, 'native'),
                 height = grobHeight(normal.box),
                 width = grobWidth(normal.box),
-                just = c('centre', 'bottom')
+                just = c('centre', 'centre')
                 )
             )
         );
