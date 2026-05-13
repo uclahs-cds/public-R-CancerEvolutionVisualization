@@ -28,7 +28,7 @@ axis.overlap <- function(
     if (return.cex & !is.null(overlaps)) {
         new.cex <- cex;
 
-        while (!is.null(overlaps)) {
+        while (!is.null(overlaps) && new.cex > 0.05) {
             new.cex <- new.cex - 0.05;
             overlaps <- axis.overlap(xpos, node.text, line.dist, axis.type, new.cex, panel.width);
             }
@@ -119,8 +119,11 @@ position.node.text <- function(
     split = FALSE,
     label.nodes = FALSE,
     adjust.axis.overlap = TRUE,
-    cex = cex
+    cex = cex,
+    plotting.direction = 'down'
     ) {
+
+    is.horizontal <- !is.numeric(plotting.direction) && plotting.direction %in% c('left', 'right');
 
     text.grob.list <- vector('list', length(unlist(node.list)));
     orig.cex <- cex;
@@ -209,10 +212,9 @@ position.node.text <- function(
                     vjust <- 'center';
                 } else {
                     ypos <- label.bottom + (g - 1) * spacing + heights - spacing;
-
                     #back computing the x position based on the intercept and the slope
                     xpos <- ifelse(
-                        is.infinite(slope),
+                        is.infinite(slope) || is.horizontal,
                         yes = tree.max.adjusted$x1[s],
                         no = (ypos - intercept) / slope
                         );
@@ -235,14 +237,25 @@ position.node.text <- function(
                             no = sum(str.heights.left[c(1:(g - 1))])
                             );
 
-                        ypos <- label.bottom + (g - 1) * spacing + heights - spacing;
-                        text.grob.list[[idx]] <- textGrob(
-                            node.list[[s]][g],
-                            x = unit(xpos - xline.dist, 'inches'),
-                            y = unit(ypos,'inches'),
-                            just = c('right', 'bottom'),
-                            gp = gpar(col = node.text.col[[s]][g], cex = cex)
-                            );
+                        
+                        if (is.horizontal) {
+                            text.grob.list[[idx]] <- textGrob(
+                                node.list[[s]][g],
+                                x = unit(ypos, 'inches'),
+                                y = unit(xpos - xline.dist, 'inches'),
+                                just = c('right', 'top'),
+                                gp = gpar(col = node.text.col[[s]][g], cex = cex)
+                                );
+                        } else {
+                            ypos <- label.bottom + (g - 1) * spacing + heights - spacing;
+                            text.grob.list[[idx]] <- textGrob(
+                                node.list[[s]][g],
+                                x = unit(xpos - xline.dist, 'inches'),
+                                y = unit(ypos,'inches'),
+                                just = c('right', 'bottom'),
+                                gp = gpar(col = node.text.col[[s]][g], cex = cex)
+                                );
+                            }
                     } else {
                         offset.left <- ceiling(length(node.text.col[[s]]) / 2);
                         heights <- ifelse((
@@ -251,15 +264,25 @@ position.node.text <- function(
                             no = sum(str.heights.right[c(1:(g - offset.left - 1))])
                             );
 
-                        ypos <- label.bottom + (g - offset.left - 1) * spacing + heights - spacing;
 
-                        text.grob.list[[idx]] <- textGrob(
-                            node.list[[s]][g],
-                            x = unit(xpos + xline.dist, 'inches'),
-                            y = unit(ypos, 'inches'),
-                            just = c('left', 'bottom'),
-                            gp = gpar(col = node.text.col[[s]][g], cex = cex)
-                            );
+                        if (is.horizontal) {
+                            text.grob.list[[idx]] <- textGrob(
+                                node.list[[s]][g],
+                                x = unit(xpos, 'inches'),
+                                y = unit(ypos + xline.dist, 'inches'),
+                                just = c('right', 'bottom'),
+                                gp = gpar(col = node.text.col[[s]][g], cex = cex)
+                                );
+                        } else {
+                            ypos <- label.bottom + (g - offset.left - 1) * spacing + heights - spacing;
+                            text.grob.list[[idx]] <- textGrob(
+                                node.list[[s]][g],
+                                x = unit(xpos + xline.dist, 'inches'),
+                                y = unit(ypos, 'inches'),
+                                just = c('left', 'bottom'),
+                                gp = gpar(col = node.text.col[[s]][g], cex = cex)
+                                );
+                            }
                         }
                 } else if (alternating) {
                     # Alternate between placing the text to the left and to the right of the node
@@ -271,15 +294,25 @@ position.node.text <- function(
                         xline.dist.adj <- xline.dist;
                         }
 
-                    text.grob.list[[idx]] <- textGrob(
-                        node.list[[s]][g],
-                        x = unit(xpos + xline.dist.adj, 'inches'),
-                        y = unit(ypos, 'inches'),
-                        just = just,
-                        gp = gpar(col = node.text.col[[s]][g], cex = cex)
-                        );
+                    if (is.horizontal) {
+                        text.grob.list[[idx]] <- textGrob(
+                            node.list[[s]][g],
+                            x = unit(xpos, 'inches'),
+                            y = unit(ypos + xline.dist.adj, 'inches'),
+                            just = c('center', ifelse(xline.dist.adj > 0, 'bottom', 'top')),
+                            gp = gpar(col = node.text.col[[s]][g], cex = cex)
+                            );
+                    } else {
+                        text.grob.list[[idx]] <- textGrob(
+                            node.list[[s]][g],
+                            x = unit(xpos + xline.dist.adj, 'inches'),
+                            y = unit(ypos, 'inches'),
+                            just = just,
+                            gp = gpar(col = node.text.col[[s]][g], cex = cex)
+                            );
+                        }
 
-                    if (adjust.axis.overlap) {
+                    if (adjust.axis.overlap && !is.horizontal) {
                         overlaps.axis  <- axis.overlap(
                             xpos, node.list[[s]][g],
                             xline.dist.adj,
@@ -304,7 +337,8 @@ position.node.text <- function(
                                 node.radius = node.radius,
                                 alternating = alternating,
                                 split = split,
-                                label.nodes = label.nodes
+                                label.nodes = label.nodes,
+                                plotting.direction = plotting.direction
                                 );
 
                             return(text.grob.list);
@@ -418,7 +452,7 @@ position.node.text <- function(
                                 }
                             }
 
-                        if (adjust.axis.overlap) {
+                        if (adjust.axis.overlap && !is.horizontal) {
                             overlaps.axis  <- axis.overlap(
                                 xpos,
                                 node.list[[s]][g],
@@ -444,7 +478,8 @@ position.node.text <- function(
                                     node.radius = node.radius,
                                     alternating = alternating,
                                     split = split,
-                                    label.nodes = label.nodes
+                                    label.nodes = label.nodes,
+                                    plotting.direction = plotting.direction
                                     );
 
                                 return(text.grob.list);
@@ -452,17 +487,33 @@ position.node.text <- function(
                             }
                         }
 
-                    text.grob.list[[idx]] <- textGrob(
-                        node.list[[s]][g],
-                        x = unit(xpos + xline.dist, 'inches'),
-                        y = unit(ypos, 'inches'),
-                        just = c(hjust, vjust),
-                        gp = gpar(
-                            col = node.text.col[[s]][g],
-                            fontface = node.text.fontface[[s]][g],
-                            cex = cex
-                            )
-                        );
+                    if (is.horizontal) {
+                        offset.x <- ceiling(length(node.text.col[[s]]) / 2);
+                        xpos <- tree.max.adjusted$x1[s] - ((tree.max.adjusted$x1[s] - tree.max.adjusted$x0[s]) * 0.5);
+                        text.grob.list[[idx]] <- textGrob(
+                            node.list[[s]][g],
+                            x = unit(xpos, 'inches'),
+                            y = unit(ypos + xline.dist, 'inches'),
+                            just = c('center', ifelse(xline.dist > 0, 'bottom', 'top')),
+                            gp = gpar(
+                                col = node.text.col[[s]][g],
+                                fontface = node.text.fontface[[s]][g],
+                                cex = cex
+                                )
+                            );
+                    } else {
+                        text.grob.list[[idx]] <- textGrob(
+                            node.list[[s]][g],
+                            x = unit(xpos + xline.dist, 'inches'),
+                            y = unit(ypos, 'inches'),
+                            just = c(hjust, vjust),
+                            gp = gpar(
+                                col = node.text.col[[s]][g],
+                                fontface = node.text.fontface[[s]][g],
+                                cex = cex
+                                )
+                            );
+                        }
                     }
 
                 idx <- idx + 1;
@@ -490,13 +541,13 @@ add.text2 <- function(
     node.radius = NULL,
     alternating = TRUE,
     split = TRUE,
-    clone.out = NULL
+    clone.out = NULL,
+    plotting.direction = 'down'
     ) {
 
     # Radius in native units
     node.radius <- node.radius / scale;
     node.text <- node.text[node.text$node %in% tree$tip, ];
-
     node.list <- vector('list', nrow(tree));
     node.text.col <- vector('list', nrow(tree));
     node.text.fontface <- vector('list', nrow(tree));
@@ -591,7 +642,6 @@ add.text2 <- function(
 
     tree.max.adjusted$slope <- (tree.max.adjusted$y1 - tree.max.adjusted$y0) / (tree.max.adjusted$x1 - tree.max.adjusted$x0);
     tree.max.adjusted$intercept <- tree.max.adjusted$y1 - tree.max.adjusted$slope * tree.max.adjusted$x1;
-
     text.grob.list <- position.node.text(
         tree.max.adjusted = tree.max.adjusted,
         node.list = node.list,
@@ -606,7 +656,8 @@ add.text2 <- function(
         node.radius = node.radius,
         alternating = alternating,
         split = split,
-        label.nodes = label.nodes
+        label.nodes = label.nodes,
+        plotting.direction = plotting.direction
         );
 
     text.grob.gList <- do.call(gList, text.grob.list);

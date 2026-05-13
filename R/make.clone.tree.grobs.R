@@ -232,7 +232,8 @@ make.clone.tree.grobs <- function(
             node.radius = node.radius,
             scale = scale1,
             clone.out = clone.out,
-            alternating = FALSE
+            alternating = FALSE,
+            plotting.direction = plotting.direction
             );
 
         clone.out$grobs <- c(clone.out$grobs, list(node.text.grobs));
