@@ -102,7 +102,6 @@ add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, 
     pushViewport(vp);
 
     label.grob <- getGrob(axisGrob, 'labels');
-    ticks.grob <- getGrob(axisGrob, 'ticks');
     gap.mm     <- convertX(unit(1.5, 'lines'), 'mm', valueOnly = TRUE);
 
     if (axis.position == 'bottom') {

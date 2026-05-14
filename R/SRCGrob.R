@@ -34,6 +34,7 @@ SRCGrob <- function(
     scale.size.2 = NA,
     scale.padding = 1
     ) {
+
     add.node.text <- !is.null(node.text);
     add.polygons <- !is.null(tree$CP) && !disable.polygons;
     text.on.nodes <- FALSE;
