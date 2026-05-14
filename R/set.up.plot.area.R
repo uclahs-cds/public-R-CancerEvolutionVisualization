@@ -82,7 +82,6 @@ make.plot.viewport <- function(
         name = 'plot.vp',
         xscale = clone.out$xlims,
         yscale = clone.out$ylims,
-        # yscale = c(clone.out$ymax, 0),
         just = just,
         gp = gpar(fill = 'pink'),
         clip = clip
@@ -100,78 +99,47 @@ extend.axis <- function(axisGrob, limits, type) {
     }
 
 add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, vp) {
+    pushViewport(vp);
+
+    label.grob <- getGrob(axisGrob, 'labels');
+    ticks.grob <- getGrob(axisGrob, 'ticks');
+    gap.mm     <- convertX(unit(1.5, 'lines'), 'mm', valueOnly = TRUE);
+
     if (axis.position == 'bottom') {
-        # d <- 'y';
-        just <- c('centre', 'top');
-        rot <- 0;
-        x <- unit(0.5, 'npc');
-        y <- (getGrob(axisGrob, 'labels')$y + getGrob(axisGrob, 'ticks')$y1) * 1.5;
+        just       <- c('centre', 'top');
+        rot        <- 0;
+        x          <- unit(0.5, 'npc');
+        label.y.mm <- convertY(label.grob$y, 'mm', valueOnly = TRUE);
+        label.h.mm <- convertY(grobHeight(label.grob), 'mm', valueOnly = TRUE);
+        # bottom axis: tick labels extend downward from label.y.mm;
+        # outer (bottom) edge = label.y.mm - label.h.mm; step down by gap
+        y <- unit(label.y.mm - label.h.mm - gap.mm, 'mm');
     } else if (axis.position == 'top') {
-        # d <- 'y';
-        just <- c('centre', 'bottom');
-        rot <- 0;
-        x <- unit(0.5, 'npc');
-        y <- (getGrob(axisGrob, 'ticks')$y0) * 1.4;
-        # y <- unit(
-        #     # convertY(getGrob(axisGrob, 'labels')$y, 'mm', valueOnly = TRUE),
-        #         convertY(getGrob(axisGrob, 'ticks')$y0 * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
-        #         # convertY(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
-        #     'mm'
-        #     );
-        # x <- unit(
-        # convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) +
-        #     convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
-        #     convertX(getGrob(axisGrob, 'labels')$x * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
-        # 'mm'
-        # );
-
+        just       <- c('centre', 'bottom');
+        rot        <- 0;
+        x          <- unit(0.5, 'npc');
+        label.y.mm <- convertY(label.grob$y, 'mm', valueOnly = TRUE);
+        label.h.mm <- convertY(grobHeight(label.grob), 'mm', valueOnly = TRUE);
+        # top axis: tick labels extend upward from label.y.mm;
+        # outer (top) edge = label.y.mm + label.h.mm; step up by gap
+        y <- unit(label.y.mm + label.h.mm + gap.mm, 'mm');
     } else {
-        pushViewport(vp);
+        label.x.mm <- convertX(label.grob$x, 'mm', valueOnly = TRUE);
+        label.w.mm <- convertX(grobWidth(label.grob), 'mm', valueOnly = TRUE);
+        y <- unit(mean(as.numeric(getGrob(axisGrob, 'major')$y)), 'native');
 
-        tick.length  <- unit( 0.5, 'lines') * axisGrob$gp$cex;
-        #     diff(c(
-        #         (getGrob(axisGrob, 'ticks')$x0),
-        #         (getGrob(axisGrob, 'ticks')$x1)
-        #         )),
-        #     'lines'
-        #     );
-        # print((getGrob(axisGrob, 'ticks')$x0))
-        # print((getGrob(axisGrob, 'ticks')$x1))
-        # print(tick.length)
-        # y <- convertY(
-        #     unit(max(as.numeric(getGrob(axisGrob, 'major')$y)), 'native'),
-        #     'inches'
-        #     );
-        y <- unit(mean(as.numeric(getGrob(axisGrob, 'major')$y)), 'native')
-            
         if (axis.position == 'left') {
-            # d <- 'x';
             just <- c('right', 'centre');
-            rot <- 90;
-        
-            # x <- getGrob(axisGrob, 'labels')$x + (tick.length * 1.5);
-            # x <- (getGrob(axisGrob, 'labels')$x + tick.length) * 1.5;
-            x <- unit(
-                convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) -
-                    convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
-                    convertX(getGrob(axisGrob, 'labels')$x * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
-                'mm'
-                );
+            rot  <- 90;
+            x <- unit(label.x.mm - label.w.mm - gap.mm, 'mm');
         } else if (axis.position == 'right') {
-            # d <- 'x';
             just <- c('left', 'centre');
-            # x <- getGrob(axisGrob, 'labels')$x + (tick.length * 1.5);
-            x <- unit(
-                convertX(grobWidth(getGrob(axisGrob, 'labels')), 'mm', valueOnly = TRUE) * -(axisGrob$gp$cex) +
-                    convertX(unit(1, 'lines') * axisGrob$gp$cex, 'mm', valueOnly = TRUE) +
-                    convertX(getGrob(axisGrob, 'labels')$x * axisGrob$gp$cex, 'mm', valueOnly = TRUE),
-                'mm'
-                );
-            rot <- 270;
+            rot  <- 270;
+            x <- unit(label.x.mm + label.w.mm + gap.mm, 'mm');
             }
-
-        popViewport()
         }
+
+    popViewport();
 
     axis.lab <- textGrob(
         name = 'axis.label',
