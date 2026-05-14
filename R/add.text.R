@@ -194,6 +194,10 @@ position.node.text <- function(
                     (!label.nodes && (label.bottom + str.heightsum) > (tree.max.adjusted$y0[s] + node.radius * 0.5))
                 ) {
                     cex <- cex - 0.05;
+                    if (cex < 0.01) {
+                        cex <- 0.01;
+                        break;
+                        }
                     }
                 }
 
@@ -462,8 +466,10 @@ position.node.text <- function(
                                 return.cex = TRUE
                                 );
 
-                            # Shrink the text if they overlap
-                            if (!is.null(overlaps.axis)) {
+                            # Shrink the text if they overlap; only recurse when
+                            # axis.overlap found a strictly smaller cex, otherwise
+                            # we would loop infinitely at the minimum cex value.
+                            if (!is.null(overlaps.axis) && overlaps.axis < cex) {
                                 text.grob.list <- position.node.text(
                                     tree.max.adjusted = tree.max.adjusted,
                                     node.list = node.list,

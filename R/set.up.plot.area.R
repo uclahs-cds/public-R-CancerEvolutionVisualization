@@ -44,6 +44,12 @@ calculate.main.plot.size <- function(
     # width  <- (xmax - xmin + pad.left + pad.right) * scale1;
     # height <- (ymax - ymin + pad.bottom + pad.top) * scale1;
 
+    # Guard against degenerate scales (e.g. all nodes at x=0 when polygons are disabled)
+    if (xmax == xmin) {
+        xmin <- xmin - 0.5;
+        xmax <- xmax + 0.5;
+        }
+
     xlims <- c(xmin, xmax);
     ylims <- c(ymax, ymin);
 
