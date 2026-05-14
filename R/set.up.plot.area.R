@@ -30,20 +30,6 @@ calculate.main.plot.size <- function(
     ymin <- min(all.y);
     ymax <- max(all.y);
 
-    # Remove padding on the axis edge so the CCF axis grob sits flush
-    # against the polygon tip. Non-cardinal angles have no defined axis side.
-    # tol <- 1e-9;
-    # pad.bottom <- if (abs(start.angle)        < tol) 0 else padding;
-    # pad.top    <- if (abs(start.angle - pi)   < tol) 0 else padding;
-    # pad.right  <- if (abs(start.angle - pi/2) < tol) 0 else padding;
-    # pad.left   <- if (abs(start.angle + pi/2) < tol) 0 else padding;
-
-    # xlims <- c(xmin - pad.left,   xmax + pad.right);
-    # ylims <- c(ymax + pad.bottom, ymin - pad.top);
-
-    # width  <- (xmax - xmin + pad.left + pad.right) * scale1;
-    # height <- (ymax - ymin + pad.bottom + pad.top) * scale1;
-
     # Guard against degenerate scales (e.g. all nodes at x=0 when polygons are disabled)
     if (xmax == xmin) {
         xmin <- xmin - 0.5;
@@ -56,12 +42,6 @@ calculate.main.plot.size <- function(
     width  <- (xmax - xmin) * scale1;
     height <- (ymax - ymin) * scale1;
 
-    # if (!is.null(min.width) && width < min.width) {
-    #     expand   <- (min.width - width) / (2 * scale1);
-    #     xlims[1] <- xlims[1] - expand;
-    #     xlims[2] <- xlims[2] + expand;
-    #     width    <- min.width;
-    #     }
     clone.out$height <- height;
     clone.out$width <- width;
     clone.out$xlims <- xlims;
