@@ -34,16 +34,6 @@ SRCGrob <- function(
     scale.size.2 = NA,
     scale.padding = 1
     ) {
-    if ('CP' %in% colnames(tree) && !(plotting.direction %in% c('down', 0))) {
-        warning(paste(
-            '"plotting.direction" is not yet supported with "CP" polygon column.',
-            '"plotting.direction" will be ignored.'
-            ));
-        }
-
-    if ('CCF' %in% colnames(tree) && !('CP' %in% colnames(tree))) {
-        tree$CP <- tree$CCF;
-        }
 
     add.node.text <- !is.null(node.text);
     add.polygons <- !is.null(tree$CP) && !disable.polygons;
@@ -137,7 +127,8 @@ SRCGrob <- function(
         scale.bar.coords = scale.bar.coords,
         scale.size.1 = scale.size.1,
         scale.size.2 = scale.size.2,
-        scale.padding = scale.padding
+        scale.padding = scale.padding,
+        plotting.direction = plotting.direction
         );
 
     out.tree <- gTree(

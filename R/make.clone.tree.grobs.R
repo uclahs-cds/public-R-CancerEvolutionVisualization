@@ -41,6 +41,7 @@ make.clone.tree.grobs <- function(
     scale.size.1,
     scale.size.2,
     scale.padding,
+    plotting.direction = 'down',
     ...
     ) {
     #initializing dataframe for subclones
@@ -110,12 +111,42 @@ make.clone.tree.grobs <- function(
         );
 
     clone.out$no.ccf <- no.ccf;
+
+    # Rotate node positions and branch angles for fish plots (with CP data) when start.angle is non-zero
+    # This ensures branches and nodes rotate along with the polygons
+    if (!no.ccf && start.angle != 0) {
+        rotated.nodes <- rotate.coords(
+            x = clone.out$v$x,
+            y = clone.out$v$y,
+            rotate.by = start.angle,
+            x.origin = 0,
+            y.origin = 0
+            );
+        clone.out$v$x <- rotated.nodes$x;
+        clone.out$v$y <- rotated.nodes$y;
+
+        clone.out$tree$angle <- clone.out$tree$angle + start.angle;
+
+        for (j in seq_along(clone.out$clones)) {
+            rot.poly <- rotate.coords(
+                x = clone.out$clones[[j]]$x,
+                y = clone.out$clones[[j]]$y,
+                rotate.by = start.angle,
+                x.origin = 0,
+                y.origin = 0
+                );
+            clone.out$clones[[j]]$x <- rot.poly$x;
+            clone.out$clones[[j]]$y <- rot.poly$y;
+            }
+        }
+
     plot.size <- calculate.main.plot.size(
         clone.out,
         scale1,
         wid,
         min.width,
-        node.radius
+        node.radius,
+        start.angle = start.angle
         );
 
     if (!no.ccf) {
@@ -159,7 +190,8 @@ make.clone.tree.grobs <- function(
         no.ccf = no.ccf,
         xaxis.label = xaxis.label,
         yaxis1.label = yaxis1.label,
-        yaxis2.label = yaxis2.label
+        yaxis2.label = yaxis2.label,
+        plotting.direction = plotting.direction
         );
 
     if (scale.bar) {
@@ -200,7 +232,8 @@ make.clone.tree.grobs <- function(
             node.radius = node.radius,
             scale = scale1,
             clone.out = clone.out,
-            alternating = FALSE
+            alternating = FALSE,
+            plotting.direction = plotting.direction
             );
 
         clone.out$grobs <- c(clone.out$grobs, list(node.text.grobs));
