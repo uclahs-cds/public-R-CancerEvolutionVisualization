@@ -26,7 +26,7 @@ data.dir <- file.path(pkg.root, 'tests', 'testthat', 'data')
 # Helper
 # ---------------------------------------------------------------------------
 
-update_rda <- function(filename, ...) {
+update.rda <- function(filename, ...) {
     path <- file.path(data.dir, filename)
     vars <- list(...)
     list2env(vars, envir = environment())
@@ -49,7 +49,7 @@ local({
         plotting.direction = 30
         )
 
-    update_rda(
+    update.rda(
         'branching.fixed.plots.Rda',
         branching.fixed.example        = branching.fixed.example,
         branching.fixed.30deg.example  = branching.fixed.30deg.example
@@ -76,7 +76,7 @@ local({
         plotting.direction = 30
         )
 
-    update_rda(
+    update.rda(
         'branching.radial.plots.Rda',
         branching.radial.example        = branching.radial.example,
         branching.radial.right.example  = branching.radial.right.example,
@@ -94,7 +94,7 @@ local({
 
     branching.dendrogram.example <- SRCGrob(branching.dendrogram.test.data$tree)
 
-    update_rda(
+    update.rda(
         'branching.dendrogram.plots.Rda',
         branching.dendrogram.example = branching.dendrogram.example
         )
@@ -113,7 +113,7 @@ local({
         polygon.colour.scheme = fish.test.data$colour.scheme
         )
 
-    update_rda(
+    update.rda(
         'fish.plots.Rda',
         fish.example = fish.example
         )
@@ -149,7 +149,7 @@ local({
         plotting.direction = 30
         )
 
-    update_rda(
+    update.rda(
         'linear.plots.Rda',
         linear.example       = linear.example,
         linear.30deg.example = linear.30deg.example
@@ -171,7 +171,7 @@ local({
         plotting.direction = 30
         )
 
-    update_rda(
+    update.rda(
         'complex.plots.Rda',
         spread.example       = spread.example,
         spread.30deg.example = spread.30deg.example

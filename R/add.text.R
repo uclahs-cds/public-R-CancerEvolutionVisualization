@@ -241,7 +241,6 @@ position.node.text <- function(
                             no = sum(str.heights.left[c(1:(g - 1))])
                             );
 
-                        
                         if (is.horizontal) {
                             text.grob.list[[idx]] <- textGrob(
                                 node.list[[s]][g],
@@ -267,7 +266,6 @@ position.node.text <- function(
                             yes = 0,
                             no = sum(str.heights.right[c(1:(g - offset.left - 1))])
                             );
-
 
                         if (is.horizontal) {
                             text.grob.list[[idx]] <- textGrob(
