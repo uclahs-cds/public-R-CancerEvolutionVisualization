@@ -166,7 +166,10 @@ add.axes <- function(
 
     # Skip x-axis if plotting.direction is numeric (custom angle)
     draw.xaxis <- !is.numeric(plotting.direction);
-
+    if (plotting.direction != 'down') {
+        message('Non-vertical plotting direction detected; skipping (nSNV) x-axis rendering.');
+        yaxis.position <- 'none';
+        }
     if (!no.ccf && 'ccf' %in% colnames(clone.out$v) && all(!is.na(clone.out$v$ccf)) && draw.xaxis) {
         add.xaxis(
             clone.out,
