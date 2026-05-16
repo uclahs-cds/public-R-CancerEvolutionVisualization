@@ -14,10 +14,12 @@ calculate.main.plot.size <- function(
     min.width,
     node.radius,
     start.angle = 0,
-    horizontal.padding = 0
+    horizontal.padding = 0,
+    vertical.padding = 0
     ) {
 
     x.padding <- horizontal.padding / scale1;
+    y.padding <- vertical.padding / scale1;
 
     all.x <- clone.out$v$x;
     all.y <- clone.out$v$y;
@@ -28,8 +30,8 @@ calculate.main.plot.size <- function(
 
     xmin <- min(all.x) - x.padding;
     xmax <- max(all.x) + x.padding;
-    ymin <- min(all.y);
-    ymax <- max(all.y);
+    ymin <- min(all.y) - y.padding;
+    ymax <- max(all.y) + y.padding;
 
     # Guard against degenerate scales (e.g. all nodes at x=0 when polygons are disabled)
     if (xmax == xmin) {

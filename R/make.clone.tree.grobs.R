@@ -141,6 +141,13 @@ make.clone.tree.grobs <- function(
             }
         }
 
+    is.horizontal.direction <- if (is.character(plotting.direction)) {
+        plotting.direction %in% c('left', 'right')
+    } else {
+        sa <- start.angle %% (2 * pi);
+        abs(sa - pi / 2) < pi / 4 || abs(sa - 3 * pi / 2) < pi / 4
+        }
+
     plot.size <- calculate.main.plot.size(
         clone.out,
         scale1,
@@ -148,7 +155,8 @@ make.clone.tree.grobs <- function(
         min.width,
         node.radius,
         start.angle = start.angle,
-        horizontal.padding = horizontal.padding
+        horizontal.padding = if (is.horizontal.direction) 0 else horizontal.padding,
+        vertical.padding = if (is.horizontal.direction) horizontal.padding else 0
         );
 
     if (!no.ccf) {
