@@ -113,6 +113,7 @@ SRCGrob <- function(
         axis.cex = axis.cex,
         xaxis.label = xaxis.label,
         min.width = min.width,
+        horizontal.padding = horizontal.padding,
         label.nodes = label.nodes,
         node.col = node.col,
         label.cex = label.cex,

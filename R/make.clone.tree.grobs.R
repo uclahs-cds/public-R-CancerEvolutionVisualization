@@ -27,6 +27,7 @@ make.clone.tree.grobs <- function(
     xaxis.label,
     min.width,
     node.radius,
+    horizontal.padding = 0,
     label.nodes,
     node.col,
     label.cex,
@@ -146,7 +147,8 @@ make.clone.tree.grobs <- function(
         wid,
         min.width,
         node.radius,
-        start.angle = start.angle
+        start.angle = start.angle,
+        horizontal.padding = horizontal.padding
         );
 
     if (!no.ccf) {
