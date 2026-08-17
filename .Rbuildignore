@@ -6,3 +6,4 @@
 ^metadata\.yaml$
 ^tests/update-snapshots\.R$
 ^\.DS_Store$
+^Rplots\.pdf$
