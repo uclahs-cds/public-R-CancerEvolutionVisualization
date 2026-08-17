@@ -37,6 +37,11 @@ SRCGrob <- function(
 
     add.node.text <- !is.null(node.text);
     add.polygons <- !is.null(tree$CP) && !disable.polygons;
+    # Formerly the user-facing 'genes.on.nodes' parameter, disabled in 07aba5d
+    # and renamed in 7e06ee3. Do not re-expose this without fixing the
+    # 'label.nodes' layout in position.node.text() first: it anchors every
+    # label for a node to that node's centre, so all of a node's labels land
+    # on the same point and can be pushed outside the panel (issue #23).
     text.on.nodes <- FALSE;
     node.text.line.dist <- prep.text.line.dist(node.text.line.dist);
 
