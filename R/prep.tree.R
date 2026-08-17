@@ -81,6 +81,8 @@ prep.tree <- function(
                 ));
 
             tree.df$CP <- NULL;
+        } else {
+            tree.df <- clamp.CP.to.parent(tree.df);
             }
         }
 
@@ -302,6 +304,60 @@ reorder.nodes <- function(tree.df) {
 
 reorder.nodes.by.CP <- function(tree.df) {
     return(tree.df[order(-(tree.df$CP), tree.df$parent), ]);
+    }
+
+# A subclone cannot occupy more of a tumour than the clone it arose in, so a
+# node's cellular prevalence can never exceed its parent's. Clone polygons are
+# laid out inside the horizontal span allocated to their parent, so a child CP
+# above the parent CP produces a polygon drawn outside its parent clone.
+# Offending values are pulled down to the parent's CP rather than rejected,
+# so that a plot is still produced for CP values that only breach the
+# constraint by measurement noise.
+# The tree is walked from the root outwards so that a clamped node constrains
+# its own descendants in turn.
+clamp.CP.to.parent <- function(tree.df) {
+    root.name <- '-1';
+
+    node.names <- rownames(tree.df);
+    CP <- setNames(tree.df$CP, node.names);
+
+    parents <- setNames(as.character(tree.df$parent), node.names);
+    parents[is.na(parents)] <- root.name;
+
+    clamped.nodes <- character(0);
+    queue <- node.names[parents == root.name];
+
+    # Every node is queued exactly once, when its parent is processed,
+    # so this terminates without a separate iteration guard.
+    while (length(queue) > 0) {
+        node <- queue[[1]];
+        queue <- queue[-1];
+        parent <- parents[[node]];
+
+        if (parent != root.name && !is.na(CP[[node]]) && !is.na(CP[[parent]])) {
+            if (CP[[node]] > CP[[parent]]) {
+                CP[[node]] <- CP[[parent]];
+                clamped.nodes <- c(
+                    clamped.nodes,
+                    paste0(node, ' (parent ', parent, ')')
+                    );
+                }
+            }
+
+        queue <- c(queue, node.names[parents == node]);
+        }
+
+    if (length(clamped.nodes) > 0) {
+        warning(paste(
+            'Cellular prevalence cannot be greater than the parent node\'s.',
+            'The CP of the following nodes has been reduced to the CP of',
+            'their parent:',
+            paste(clamped.nodes, collapse = ', ')
+            ));
+        }
+
+    tree.df$CP <- unname(CP);
+    return(tree.df);
     }
 
 reorder.trunk.node <- function(tree.df) {
