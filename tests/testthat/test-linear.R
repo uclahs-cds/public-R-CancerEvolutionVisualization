@@ -15,7 +15,11 @@ test_that(
             main.cex = 1.55,
             main.y = 0.3,
             size.units = 'inches',
-            horizontal.padding = -1,
+            # horizontal.padding = -1 squeezed the plot until the gene
+            # annotations rendered as unreadable specks and the axis ticks
+            # crowded over the polygon (issue #186). A positive padding keeps
+            # the axes clear of the polygon and the gene text legible.
+            horizontal.padding = 1,
             add.normal = TRUE,
             );
         expect_true(compare.trees(linear.example, result.tree));

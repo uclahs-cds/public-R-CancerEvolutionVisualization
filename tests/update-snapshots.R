@@ -11,14 +11,34 @@
 # The script re-installs the package from source first so the snapshots are
 # always built against the current code.
 
-pkg.root <- normalizePath(file.path(dirname(sys.frame(1)$ofile), '..'), mustWork = FALSE)
-if (!nzchar(pkg.root) || pkg.root == '.') {
-    pkg.root <- getwd()
+get.script.dir <- function() {
+    # Rscript exposes the script path as --file=; sys.frames() only carries
+    # $ofile when the script is source()d. sys.frame(1) errors outright under
+    # Rscript ("not that many frames on the stack"), which broke the usage
+    # documented above.
+    file.arg <- grep('^--file=', commandArgs(trailingOnly = FALSE), value = TRUE);
+    if (1 == length(file.arg)) {
+        return(dirname(normalizePath(sub('^--file=', '', file.arg))));
+        }
+
+    ofile <- if (length(sys.frames())) sys.frames()[[1]]$ofile else NULL;
+    if (!is.null(ofile)) {
+        return(dirname(normalizePath(ofile)));
+        }
+
+    return(NULL);
     }
 
-message('Package root: ', pkg.root)
-message('Installing package from source...')
-devtools::load_all(pkg.root, quiet = TRUE)
+script.dir <- get.script.dir();
+pkg.root <- if (is.null(script.dir)) {
+    getwd();
+} else {
+    normalizePath(file.path(script.dir, '..'), mustWork = FALSE);
+    }
+
+message('Package root: ', pkg.root);
+message('Loading package from source...');
+pkgload::load_all(pkg.root, quiet = TRUE)
 
 data.dir <- file.path(pkg.root, 'tests', 'testthat', 'data')
 
@@ -139,7 +159,8 @@ local({
         main.cex         = 1.55,
         main.y           = 0.3,
         size.units       = 'inches',
-        horizontal.padding = -1,
+        # See test-linear.R: -1 collapsed the gene annotations (issue #186).
+        horizontal.padding = 1,
         add.normal       = TRUE
         )
 
