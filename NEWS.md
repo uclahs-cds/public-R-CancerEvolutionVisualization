@@ -40,6 +40,8 @@
 ## Bug
 * Resolved issue where the spread parameter was not applied in dendrogram mode.
 * Resolved issue for simple dendrogram trees ( < 6 nodes or binary tree), where node angles were not calculated correctly.
+* Resolved issue where `node.text` was unreadable, mispositioned or errored with
+  "invalid 'cex' value" for any `plotting.direction` other than 'down'.
 
 
 # CancerEvolutionVisualization 2.0.1 (2023-11-17)
