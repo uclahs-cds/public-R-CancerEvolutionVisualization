@@ -14,6 +14,8 @@ prep.tree <- function(
     # Error on invalid tree structure
     get.root.node(tree.df);
 
+    warn.ignored.length.columns(colnames(tree.df));
+
     branch.names <- sort(get.branch.names(tree.df));
     # Limit to 2 branches. This will
     if (length(branch.names) > 2) {
@@ -748,7 +750,11 @@ get.default.node.label.colour <- function(node.colour) {
     }
 
 get.branch.names <- function(tree.df) {
-    prefix.regex <- '(edge\\.((type)|(width)|(col))\\.)|(length\\.?)';
+    # The prefix must be anchored to the start of the column name. Without the
+    # anchor a column such as 'snv.length' matched the 'length' alternative and
+    # produced the phantom branch name 'snv.' (issue #162), even though
+    # validate.branch.colname rejects it as a branch length column.
+    prefix.regex <- '^((edge\\.((type)|(width)|(col))\\.)|(length\\.?))';
     branch.columns <- grep(prefix.regex, colnames(tree.df), value = TRUE);
     branch.names <- gsub(prefix.regex, '', branch.columns);
     return(unique(branch.names));
