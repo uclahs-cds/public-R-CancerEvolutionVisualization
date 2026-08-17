@@ -13,10 +13,13 @@ calculate.main.plot.size <- function(
     wid,
     min.width,
     node.radius,
-    start.angle = 0
+    start.angle = 0,
+    horizontal.padding = 0,
+    vertical.padding = 0
     ) {
 
-    padding <- 2 * node.radius / scale1;
+    x.padding <- horizontal.padding / scale1;
+    y.padding <- vertical.padding / scale1;
 
     all.x <- clone.out$v$x;
     all.y <- clone.out$v$y;
@@ -25,10 +28,10 @@ calculate.main.plot.size <- function(
         all.y <- c(all.y, unlist(lapply(clone.out$clones, function(cl) cl$y)));
         }
 
-    xmin <- min(all.x);
-    xmax <- max(all.x);
-    ymin <- min(all.y);
-    ymax <- max(all.y);
+    xmin <- min(all.x) - x.padding;
+    xmax <- max(all.x) + x.padding;
+    ymin <- min(all.y) - y.padding;
+    ymax <- max(all.y) + y.padding;
 
     # Guard against degenerate scales (e.g. all nodes at x=0 when polygons are disabled)
     if (xmax == xmin) {
@@ -163,7 +166,10 @@ add.axes <- function(
 
     # Skip x-axis if plotting.direction is numeric (custom angle)
     draw.xaxis <- !is.numeric(plotting.direction);
-
+    if (plotting.direction != 'down') {
+        message('Non-vertical plotting direction detected; skipping (nSNV) x-axis rendering.');
+        yaxis.position <- 'none';
+        }
     if (!no.ccf && 'ccf' %in% colnames(clone.out$v) && all(!is.na(clone.out$v$ccf)) && draw.xaxis) {
         add.xaxis(
             clone.out,
@@ -320,8 +326,7 @@ add.xaxis <- function(
             gp = gpar(cex = axis.label.cex),
             main = (axis.position == 'left')
             );
-        # clone.out$ylims <- unit(clone.out$ylims * 1.5, 'native')
-        xaxis <- extend.axis(xaxis, unit(clone.out$ylims * 1.5, 'native'), type = 'y');
+        xaxis <- extend.axis(xaxis, unit(clone.out$ylims, 'native'), type = 'y');
     } else {
         # For vertical plots, use xaxisGrob
         xaxis <- xaxisGrob(
@@ -331,7 +336,7 @@ add.xaxis <- function(
             gp = gpar(cex = axis.label.cex),
             main = (axis.position == 'bottom')
             );
-        xaxis <- extend.axis(xaxis, unit(clone.out$xlims * 1.5, 'native'), type = 'x');
+        xaxis <- extend.axis(xaxis, unit(clone.out$xlims, 'native'), type = 'x');
         }
     # Add the axis label
     xaxis.gTree <- add.axis.label(

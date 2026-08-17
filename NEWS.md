@@ -35,6 +35,7 @@
 * Fix bug where the x-axis only renders when y-axis is also rendered.
 * Fix issue when creating polygons with more than 2 siblings
 * Use updated `R CMD check` CI/CD action
+* `plotting.direction` generalizable to fishplots with CCF polygons
 
 ## Bug
 * Resolved issue where the spread parameter was not applied in dendrogram mode.
