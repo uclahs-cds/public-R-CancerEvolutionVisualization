@@ -13,6 +13,7 @@ SRCGrob <- function(
     ylab.cex = 1.55,
     xaxis.cex = 1.45,
     yaxis.cex = 1.45,
+    ylab.axis.padding = 1,
     xaxis.label = 'CCF',
     label.cex = NA,
     node.text.cex = 0.85,
@@ -46,6 +47,12 @@ SRCGrob <- function(
     if (polygon.scale < 0) {
         stop('"polygon.scale" must be positive.');
         }
+
+    if (!is.numeric(ylab.axis.padding) || length(ylab.axis.padding) != 1
+        || is.na(ylab.axis.padding) || ylab.axis.padding < 0) {
+        stop('"ylab.axis.padding" must be a single non-negative number.');
+        }
+
     polygon.width <- 1.2 * polygon.scale;
 
     node.col <- 'white';
@@ -111,6 +118,7 @@ SRCGrob <- function(
         yaxis2.label = yaxis2.label,
         axis.label.cex = axis.label.cex,
         axis.cex = axis.cex,
+        ylab.axis.padding = ylab.axis.padding,
         xaxis.label = xaxis.label,
         min.width = min.width,
         horizontal.padding = horizontal.padding,
