@@ -16,7 +16,16 @@ vignette: >
 library(knitr);
 library(CancerEvolutionVisualization);
 
-opts_chunk$set(warning = FALSE, message = FALSE, fig.align = 'center');
+opts_chunk$set(
+    warning = FALSE,
+    message = FALSE,
+    fig.align = 'center',
+    # rmarkdown defaults to fig.retina = 2, which quadruples the raster pixels
+    # of every embedded figure. This vignette has 32 chunks, which pushed
+    # inst/doc past 12 Mb on its own.
+    dpi = 96,
+    fig.retina = 1
+    );
 
 if (!dir.exists('figures')) dir.create('figures');
 ```

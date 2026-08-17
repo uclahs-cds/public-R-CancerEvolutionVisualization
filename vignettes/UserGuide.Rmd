@@ -16,6 +16,8 @@ vignette: >
 library(CancerEvolutionVisualization);
 
 knitr::opts_chunk$set(
+    dpi = 96,
+    fig.retina = 1,
     warning = FALSE,
     message = FALSE,
     fig.align = 'center',
