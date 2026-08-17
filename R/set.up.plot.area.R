@@ -148,6 +148,14 @@ add.axis.label <- function(axisGrob, axis.label, axis.position, axis.label.cex, 
     return(axis.gTree);
     }
 
+is.horizontal.direction <- function(plotting.direction) {
+    if (is.numeric(plotting.direction)) {
+        return(isTRUE(all.equal(plotting.direction %% 180, 90)));
+        }
+
+    return(plotting.direction %in% c('left', 'right'));
+    }
+
 add.axes <- function(
     clone.out,
     yat,
@@ -161,14 +169,19 @@ add.axes <- function(
     no.ccf = FALSE,
     axis.label.cex = list(x = 1.55, y = 1.55),
     axis.cex = list(x = 1, y = 1),
-    plotting.direction = 'down'
+    plotting.direction = 'down',
+    add.polygons = FALSE
     ) {
 
     # Skip x-axis if plotting.direction is numeric (custom angle)
     draw.xaxis <- !is.numeric(plotting.direction);
-    if (plotting.direction != 'down') {
-        message('Non-vertical plotting direction detected; skipping (nSNV) x-axis rendering.');
-        yaxis.position <- 'none';
+
+    # A horizontal fish plot lays its clone polygons out along the vertical
+    # axis, so the second (nSNV) scale no longer corresponds to anything the
+    # reader can measure. Drop that axis only -- the first y-axis stays, and
+    # every other plotting direction keeps both.
+    if (add.polygons && identical(yaxis.position, 'both') && is.horizontal.direction(plotting.direction)) {
+        yaxis.position <- 'left';
         }
     if (!no.ccf && 'ccf' %in% colnames(clone.out$v) && all(!is.na(clone.out$v$ccf)) && draw.xaxis) {
         add.xaxis(

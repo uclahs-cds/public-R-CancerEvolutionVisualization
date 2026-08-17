@@ -201,7 +201,8 @@ make.clone.tree.grobs <- function(
         xaxis.label = xaxis.label,
         yaxis1.label = yaxis1.label,
         yaxis2.label = yaxis2.label,
-        plotting.direction = plotting.direction
+        plotting.direction = plotting.direction,
+        add.polygons = add.polygons
         );
 
     if (scale.bar) {
