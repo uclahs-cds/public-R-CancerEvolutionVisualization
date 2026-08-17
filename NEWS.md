@@ -40,6 +40,11 @@
 ## Bug
 * Resolved issue where the spread parameter was not applied in dendrogram mode.
 * Resolved issue for simple dendrogram trees ( < 6 nodes or binary tree), where node angles were not calculated correctly.
+* Resolved overlapping nodes in deep trees. Child angles are offsets from the
+  parent branch, so an undamped per-tier offset accumulated and mirrored paths
+  through a symmetric tree placed two nodes at the exact same point. Angles are
+  now damped towards each node's share of the fan when, and only when, that
+  removes node collisions.
 
 
 # CancerEvolutionVisualization 2.0.1 (2023-11-17)

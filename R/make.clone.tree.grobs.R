@@ -108,7 +108,10 @@ make.clone.tree.grobs <- function(
         start.angle = start.angle,
         fixed.angle = fixed.angle,
         add.polygons = add.polygons,
-        no.ccf = no.ccf
+        no.ccf = no.ccf,
+        # Node radius in the tree's own (native) units, so overlaps can be
+        # measured against the node positions directly.
+        node.radius = node.radius / scale1
         );
 
     clone.out$no.ccf <- no.ccf;
