@@ -20,6 +20,9 @@
 * Suggest rmarkdown dependency for rendering vignettes 
 
 ## Update
+* Branch length column names must start with `length`. A column such as
+  `snv.length` is no longer treated as a branch, and now raises a warning
+  instead of being dropped silently.
 * Fixed angle calculation bug where child angles do not follow
   their parent angle, instead moving "downward" at 0 degrees.
 * Updated package metadata and README
